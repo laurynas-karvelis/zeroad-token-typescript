@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  run-unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,7 +22,7 @@ jobs:
       - name: Run Bun tests
         run: bun test
 
-  test-and-run:
+  run-smoke-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
