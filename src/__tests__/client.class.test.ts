@@ -52,7 +52,7 @@ describe("ClientHeader class", () => {
     });
   });
 
-  test("should parse as null on a forged header value", async () => {
+  test("should parse as undefined on a forged header value", async () => {
     const { privateKey } = await generateKeys();
     const header = new ClientHeader(ZEROAD_NETWORK_PUBLIC_KEY, privateKey);
 

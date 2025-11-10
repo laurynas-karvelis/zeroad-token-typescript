@@ -12,26 +12,23 @@ describe("ServerHeader class", () => {
   });
 
   test("should parse a valid welcome header", () => {
-    const header = new ServerHeader(siteId, features);
-    expect(header.decode("ZBhyPJ1VS5W5zrxNvf/IEg^1^3")).toEqual({
+    expect(ServerHeader.decode("ZBhyPJ1VS5W5zrxNvf/IEg^1^3")).toEqual({
       version: 1,
       flags: 3,
       siteId: siteId.toLocaleLowerCase(),
     });
   });
 
-  test("should parse as null on an invalid header value", () => {
-    const header = new ServerHeader(siteId, features);
+  test("should parse as undefined on an invalid header value", () => {
+    expect(ServerHeader.decode("")).toBeUndefined();
+    expect(ServerHeader.decode(null as any)).toBeUndefined();
+    expect(ServerHeader.decode(undefined as any)).toBeUndefined();
+    expect(ServerHeader.decode("1^1")).toBeUndefined();
 
-    expect(header.decode("")).toBeUndefined();
-    expect(header.decode(null as any)).toBeUndefined();
-    expect(header.decode(undefined as any)).toBeUndefined();
-    expect(header.decode("1^1")).toBeUndefined();
-
-    expect(header.decode("ZBhyPJ1VS5W5zrxNvf/IE^1^1")).toBeUndefined();
-    expect(header.decode("ZBhyPJ1VS5W5zrxNvf/IEg^1^8")).toBeUndefined();
-    expect(header.decode("ZBhyPJ1VS5W5zrxNvf/IEg^0^1")).toBeUndefined();
-    expect(header.decode("ZBhyPJ1VS5W5zrxNvf/IEg^1^1.1")).toBeUndefined();
-    expect(header.decode("ZBhyPJ1VS5W5zrxNvf/IEg^1.1^1")).toBeUndefined();
+    expect(ServerHeader.decode("ZBhyPJ1VS5W5zrxNvf/IE^1^1")).toBeUndefined();
+    expect(ServerHeader.decode("ZBhyPJ1VS5W5zrxNvf/IEg^1^8")).toBeUndefined();
+    expect(ServerHeader.decode("ZBhyPJ1VS5W5zrxNvf/IEg^0^1")).toBeUndefined();
+    expect(ServerHeader.decode("ZBhyPJ1VS5W5zrxNvf/IEg^1^1.1")).toBeUndefined();
+    expect(ServerHeader.decode("ZBhyPJ1VS5W5zrxNvf/IEg^1.1^1")).toBeUndefined();
   });
 });

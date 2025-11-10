@@ -25,7 +25,7 @@ export class ServerHeader {
     return [encodedSiteId, CURRENT_PROTOCOL_VERSION, flags].join(SEPARATOR);
   }
 
-  decode(headerValue: string | undefined): WelcomeHeaderParseResult {
+  static decode(headerValue: string | undefined): WelcomeHeaderParseResult {
     if (!headerValue?.length) return;
 
     try {
