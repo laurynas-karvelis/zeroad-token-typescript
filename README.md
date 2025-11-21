@@ -62,35 +62,33 @@ const ZERO_AD_PARTNER_HEADER_VALUE = "AZqnKU56eIC7vCD1PPlwhg^1^3";
 init({ value: ZERO_AD_PARTNER_HEADER_VALUE });
 
 app
-    .use((req, res, next) => {
-        // X-Better-Web-Welcome header injection can could have it's own simple middleware like this:
-        res.header(getServerHeaderName(), getServerHeaderValue())
-    })
-    .use((req, res, next) => {
-        const result = await processRequest(c.req.header(getClientHeaderName()));
+  .use((req, res, next) => {
+    // X-Better-Web-Welcome header injection can could have it's own simple middleware like this:
+    res.header(getServerHeaderName(), getServerHeaderValue());
+  })
+  .use((req, res, next) => {
+    const result = processRequest(c.req.header(getClientHeaderName()));
 
-        res.locals.disableAds = result.shouldRemoveAds();
-        res.locals.removePaywalls = result.shouldEnablePremiumContentAccess();
-        res.locals.vipExperience = result.shouldEnableVipExperience();
+    res.locals.disableAds = result.shouldRemoveAds();
+    res.locals.removePaywalls = result.shouldEnablePremiumContentAccess();
+    res.locals.vipExperience = result.shouldEnableVipExperience();
 
-        next();
-    })
-    .get('/', (req, res) => {
-        // The "locals.disableAds" variable can now be used to suppress rendering
-        // of ads and 3rd party non-functional trackers.
+    next();
+  })
+  .get("/", (req, res) => {
+    // The "locals.disableAds" variable can now be used to suppress rendering
+    // of ads and 3rd party non-functional trackers.
 
-        // The "locals.removePaywalls" variable can allow users to bypass pay-walled content.
-        res.render('index.ejs');
-    });
+    // The "locals.removePaywalls" variable can allow users to bypass pay-walled content.
+    res.render("index.ejs");
+  });
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 ```
 
-P.S.: Each web request coming from active subscriber using their Zero Ad Network browser extension will incur a fraction of CPU computation cost to verify the token data matches its encrypted signature. On modern web infrasctructure a request execution time will increase roughly by ~0.1ms to 3ms or so.
-
-In near future we will aim to add some form of "Request Header to processed result" caching mechanism for Redis users. In real life, Redis usually will deliver such payload slower than it would take to verify attached cryptographic token signature.
+P.S.: Each web request coming from active subscriber using their Zero Ad Network browser extension will incur a tiny fraction of CPU computation cost to verify the token data matches its encrypted signature. On modern web infrasctructure a request execution time will increase roughly by ~0.08ms to 0.2ms or so. Mileage might vary, but the impact is minimal.
 
 # Final thoughts
 

@@ -1,11 +1,11 @@
 import { describe, test, expect } from "bun:test";
-import { generateKeys } from "../subtle.crypto";
+import { generateKeys } from "../native.crypto";
 import { ClientHeader } from "../headers/client.class";
 import { CURRENT_PROTOCOL_VERSION, SITE_FEATURES, ZEROAD_NETWORK_PUBLIC_KEY } from "../constants";
 
 describe("ClientHeader class", () => {
-  test("should generate a valid header value", async () => {
-    const { publicKey, privateKey } = await generateKeys();
+  test("should generate a valid header value", () => {
+    const { publicKey, privateKey } = generateKeys();
     const header = new ClientHeader(publicKey, privateKey);
 
     const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
@@ -15,11 +15,11 @@ describe("ClientHeader class", () => {
       SITE_FEATURES.VIP_EXPERIENCE,
     ];
 
-    const headerValue = await header.encode(CURRENT_PROTOCOL_VERSION, expiresAt, features);
+    const headerValue = header.encode(CURRENT_PROTOCOL_VERSION, expiresAt, features);
 
     expect(typeof headerValue).toBe("string");
 
-    const payload = await header.decode(headerValue);
+    const payload = header.decode(headerValue);
     expect(payload).toEqual({
       expiresAt: new Date(Math.floor(expiresAt.getTime() / 1000) * 1000),
       version: CURRENT_PROTOCOL_VERSION,
@@ -28,8 +28,8 @@ describe("ClientHeader class", () => {
     });
   });
 
-  test("should generate a valid header value with expired flag set to false", async () => {
-    const { publicKey, privateKey } = await generateKeys();
+  test("should generate a valid header value with expired flag set to false", () => {
+    const { publicKey, privateKey } = generateKeys();
     const header = new ClientHeader(publicKey, privateKey);
 
     const expiresAt = new Date(Date.now() - 24 * 3600 * 1000);
@@ -39,11 +39,11 @@ describe("ClientHeader class", () => {
       SITE_FEATURES.VIP_EXPERIENCE,
     ];
 
-    const headerValue = await header.encode(CURRENT_PROTOCOL_VERSION, expiresAt, features);
+    const headerValue = header.encode(CURRENT_PROTOCOL_VERSION, expiresAt, features);
 
     expect(typeof headerValue).toBe("string");
 
-    const payload = await header.decode(headerValue);
+    const payload = header.decode(headerValue);
     expect(payload).toEqual({
       expiresAt: new Date(Math.floor(expiresAt.getTime() / 1000) * 1000),
       version: CURRENT_PROTOCOL_VERSION,
@@ -52,8 +52,8 @@ describe("ClientHeader class", () => {
     });
   });
 
-  test("should parse as undefined on a forged header value", async () => {
-    const { privateKey } = await generateKeys();
+  test("should parse as undefined on a forged header value", () => {
+    const { privateKey } = generateKeys();
     const header = new ClientHeader(ZEROAD_NETWORK_PUBLIC_KEY, privateKey);
 
     const expiresAt = new Date(Date.now() - 24 * 3600 * 1000);
@@ -63,11 +63,11 @@ describe("ClientHeader class", () => {
       SITE_FEATURES.VIP_EXPERIENCE,
     ];
 
-    const headerValue = await header.encode(CURRENT_PROTOCOL_VERSION, expiresAt, features);
+    const headerValue = header.encode(CURRENT_PROTOCOL_VERSION, expiresAt, features);
 
     expect(typeof headerValue).toBe("string");
 
-    const payload = await header.decode(headerValue);
+    const payload = header.decode(headerValue);
     expect(payload).toBeUndefined();
   });
 });

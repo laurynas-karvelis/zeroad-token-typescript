@@ -1,14 +1,14 @@
 import { CLIENT_HEADERS, ClientHeaderParseResult, PROTOCOL_VERSION, SITE_FEATURES } from "../constants";
 import { bytesToUnixTimestamp, fromBase64, hasFeature, setFeatures, toBase64, unixTimestampToBytes } from "../helpers";
-import { importPrivateKey, importPublicKey, nonce, sign, verify } from "../subtle.crypto";
+import { importPrivateKey, importPublicKey, KeyObject, nonce, sign, verify } from "../native.crypto";
 import { log } from "../logger";
 
 const NONCE_BYTES = 4;
 const SEPARATOR = ".";
 
 export class ClientHeader {
-  private cryptoPublicKey: CryptoKey | undefined;
-  private cryptoPrivateKey: CryptoKey | undefined;
+  private cryptoPublicKey: KeyObject | undefined;
+  private cryptoPrivateKey: KeyObject | undefined;
 
   private publicKey;
   private privateKey;
@@ -20,7 +20,7 @@ export class ClientHeader {
     this.privateKey = privateKey;
   }
 
-  async encode(version: PROTOCOL_VERSION, expiresAt: Date, features: SITE_FEATURES[]) {
+  encode(version: PROTOCOL_VERSION, expiresAt: Date, features: SITE_FEATURES[]) {
     if (!this.privateKey) throw new Error("Private key is required");
 
     const flags = setFeatures(0, features);
@@ -31,24 +31,22 @@ export class ClientHeader {
       new Uint8Array([flags]),
     ]);
 
-    if (!this.cryptoPrivateKey) this.cryptoPrivateKey = await importPrivateKey(this.privateKey);
-    const signature = await sign(data.buffer, this.cryptoPrivateKey);
+    if (!this.cryptoPrivateKey) this.cryptoPrivateKey = importPrivateKey(this.privateKey);
+    const signature = sign(data.buffer, this.cryptoPrivateKey);
 
     return [toBase64(data), toBase64(new Uint8Array(signature))].join(SEPARATOR);
   }
 
-  async decode(headerValue: string): Promise<ClientHeaderParseResult> {
+  decode(headerValue: string): ClientHeaderParseResult {
     if (!headerValue?.length) return;
-    if (!this.cryptoPublicKey) this.cryptoPublicKey = await importPublicKey(this.publicKey);
+    if (!this.cryptoPublicKey) this.cryptoPublicKey = importPublicKey(this.publicKey);
 
     try {
       const [data, signature] = headerValue.split(SEPARATOR);
       const dataBytes = fromBase64(data);
       const signatureBytes = fromBase64(signature);
 
-      if (
-        !(await verify(dataBytes.buffer as ArrayBuffer, signatureBytes.buffer as ArrayBuffer, this.cryptoPublicKey))
-      ) {
+      if (!verify(dataBytes.buffer as ArrayBuffer, signatureBytes.buffer as ArrayBuffer, this.cryptoPublicKey)) {
         throw new Error("Forged header value is provided");
       }
 
@@ -67,8 +65,8 @@ export class ClientHeader {
     }
   }
 
-  async processRequest(headerValue: string | undefined) {
-    const data = await this.decode(headerValue as string);
+  processRequest(headerValue: string | undefined) {
+    const data = this.decode(headerValue as string);
     return {
       data,
       shouldRemoveAds: () => shouldRemoveAds(data),

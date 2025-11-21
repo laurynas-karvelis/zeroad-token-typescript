@@ -1,4 +1,5 @@
-import * as constants from "./constants";
 import { ServerHeader } from "./headers/server.class";
 
-export { constants, ServerHeader };
+export type * from "./constants";
+export * from "./constants";
+export { ServerHeader };

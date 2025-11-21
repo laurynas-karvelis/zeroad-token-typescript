@@ -1,7 +1,6 @@
 import { describe, test, expect } from "bun:test";
 import { getClientHeaderName, getServerHeaderName, getServerHeaderValue, init, processRequest, Site } from "../index";
 import { CLIENT_HEADERS, PROTOCOL_VERSION, SERVER_HEADERS, SITE_FEATURES } from "../constants";
-import { generateKeys } from "../subtle.crypto";
 
 describe("module", () => {
   const validButExpiredClientHeaderValue =
@@ -22,10 +21,10 @@ describe("module", () => {
       expect(site.clientHeader.name).toEqual(CLIENT_HEADERS.HELLO);
     });
 
-    test("should parse client header data correctly with the official public key", async () => {
+    test("should parse client header data correctly with the official public key", () => {
       const site = new Site({ siteId, features: [SITE_FEATURES.ADLESS_EXPERIENCE] });
 
-      const request = await site.clientHeader.processRequest(validButExpiredClientHeaderValue);
+      const request = site.clientHeader.processRequest(validButExpiredClientHeaderValue);
 
       // expired token
       expect(request.data).toEqual({
@@ -70,8 +69,8 @@ describe("module", () => {
     });
 
     describe("processRequest()", () => {
-      test("should return correct Client Hello header value", async () => {
-        const processedValue = await processRequest(validButExpiredClientHeaderValue);
+      test("should return correct Client Hello header value", () => {
+        const processedValue = processRequest(validButExpiredClientHeaderValue);
         expect(processedValue).toEqual(
           expect.objectContaining({
             data: {

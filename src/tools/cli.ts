@@ -1,8 +1,6 @@
-import { generateKeys } from "./../subtle.crypto";
+import { generateKeys } from "../native.crypto";
 
-(async () => {
-  const { privateKey, publicKey } = await generateKeys();
+const { privateKey, publicKey } = generateKeys();
 
-  console.info("Public Key:", publicKey);
-  console.info("Private Key:", privateKey);
-})();
+console.info("Public Key:", publicKey);
+console.info("Private Key:", privateKey);
