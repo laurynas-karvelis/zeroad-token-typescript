@@ -1,52 +1,46 @@
-# @zeroad.network/token
+## Introduction
 
-This node module allows a ZeroAd Network programme partnering websites and Web APIs to verify whether the `X-Better-Web-Hello` HTTP request header value is a valid, untampered ZeroAd Network token, if it's not expired, type of the subscription a current user has.
+**@zeroad.network/token** is a module meant to be used by partnering sites of [Zero Ad Network](https://zeroad.network) platform. It's a lightweight module that works on Nodejs 18 and above, and Bun 1.3 and above runtimes.
 
-# Installation
+This node module allows a Zero Ad Network program partnering sites and Web APIs to verify determine if incoming web requests are coming from our browser extension users with active subscription.
 
-Install this package using your favourite nodejs:
+Their browser extension will send the `X-Better-Web-Hello` Request Header which will let our module to verify it's our actively subscribed user and will allow your site to make a decision whether to disable ads, paywalls or enable access to otherwise paid content of yours.
 
-Using `npm`:
+ZeroAd user browser extension will measure how many times and how long they spent on each resource of your website that sends the `X-Better-Web-Welcome` token. This information will go back to us and at the end of each month based on how large the active user base is and how much competition you got, you'll get awarded from each user's monthly subscription paid amount based on their usage patterns interacting with your site.
 
-```shell
-npm add @zeroad.network/token
-```
+## Setup
 
-Or `yarn`:
+If you already have your site registered with us, you can skip the section below.
 
-```shell
-yarn add @zeroad.network/token
-```
+### Register your website or web API
 
-Or using `pnpm`:
+Sign up with us by navigating in your browser to [sign up](https://zeroad.network/login), once you've logged in successfully, go to and [add a project](https://zeroad.network/publisher/sites/add) page and register your site.
 
-```shell
-pnpm add @zeroad.network/token
-```
+In the second step of the Site registration process you'll be presented with your unique `X-Better-Web-Welcome` header value for that site. Your website must respond with this header in all publicly accessible endpoints that contain HTML or RESTful response types. This will let ZeroAd Network users know that you are participating in the program.
 
-Or using `bun`:
-
-```shell
-bun add @zeroad.network/token
-```
+## Module Installation
 
 This package works well within `mjs` (ESM) and `cjs` (CJS - older node versions) environments.
 
-# Setup
+Install this package using your favourite package manager:
 
-## Register your website or web API
+```shell
+# npm
+npm add @zeroad.network/token
 
-Sign up with us by navigating in your browser to [sign up](https://zeroad.network/login), once you've logged in successfully, go to and [add a project](https://zeroad.network/publisher/sites/add) page, register your project.
+# yarn
+yarn add @zeroad.network/token
 
-On the second step of the Project registration you'll be presented with your own unique `X-Better-Web-Welcome` header value. Your website responding with this header will let ZeroAd Network users know that you are participating in the programme.
+# pnpm
+pnpm add @zeroad.network/token
 
-Their browser extension will send the `X-Better-Web-Hello` which you will then be able to verify and disable ads, paywalls or enable access to otherwise paid content.
+# or Bun
+bun add @zeroad.network/token
+```
 
-ZeroAd user browser extension will measure how many times and how long they spent on each resource of your website that sends the `X-Better-Web-Welcome` token. This information will go back to us and at the end of each month based on how large the active user base is and how much competition you got, you'll get proportionally awarded for participating in our programme.
+# Examples
 
-# Set up your website, web app
-
-The most basic use with `express` could look similar to this:
+Take the example as a reference only. The most basic, and honestly, quite complete use with `express` could look similar to this:
 
 ```js
 import express from "express";
@@ -78,7 +72,7 @@ app
     })
     .get('/', (req, res) => {
         // The "locals._disableAds" variable can now be used to suppress rendering
-        // of ad blocks and trackers.
+        // of ads and 3rd party non-functional trackers.
 
         // The "locals._removePaywalls" variable can allow users to bypass pay-walled content.
         res.render('index.ejs');
@@ -89,12 +83,18 @@ app.listen(port, () => {
 });
 ```
 
-# What's next
+P.S.: Each web request coming from active subscriber using their Zero Ad Network browser extension will incur a fraction of CPU computation cost to verify the token data matches its encrypted signature. On modern web infrasctructure a request execution time will increase roughly by ~0.1ms to 3ms or so.
 
-That's pretty much it. If you no user of ours interacts with your website or web app, you lose nothing. You can keep showing ads to the normal users, keep your paywalls etc.
+In near future we will aim to add some form of "Request Header to processed result" caching mechanism for Redis users. In real life, Redis usually will deliver such payload slower than it would take to verify attached cryptographic token signature.
 
-We hope the opposite will happen and you'll realize how many people value pure, clean content created for them that brings real and meaningful value to them.
+# Final thoughts
 
-Each website that joins us becomes a part of re-making the website as it was originally intended to be - to be a joyful and wonderful experience once again.
+If no user of ours interacts with your website or web app, you lose nothing. You can keep showing ads to normal users, keep your paywalls etc.
 
-Thank you!
+We hope the opposite will happen and you'll realize how many people value pure, clean content created that is meant for them, actual people, that brings tangible and meaningful value for everyone.
+
+Each website that joins us, becomes a part of re-making the web as it originally was intended to be - a joyful and wonderful experience once again.
+
+**Thank you!**
+
+> The "Zero Ad Network" team.

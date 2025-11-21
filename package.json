@@ -1,13 +1,14 @@
 {
   "name": "@zeroad.network/token",
-  "version": "0.0.1",
+  "version": "0.8.0",
   "license": "SEE LICENSE IN LICENSE",
   "repository": "github:laurynas-karvelis/zeroad-token",
   "homepage": "https://zeroad.network",
+  "private": false,
   "author": {
     "name": "Laurynas Karvelis <Explosive Brains Ltd>",
-    "email": "hello@explosive-brains.com",
-    "url": "http://explosive-brains.com"
+    "email": "hello@zeroad.network",
+    "url": "http://zeroad.network"
   },
   "files": [
     "./dist/**/*"
