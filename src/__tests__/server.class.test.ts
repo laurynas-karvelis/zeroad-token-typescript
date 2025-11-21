@@ -6,8 +6,13 @@ describe("ServerHeader class", () => {
   const siteId = "6418723C-9D55-4B95-B9CE-BC4DBDFFC812";
   const features = [SITE_FEATURES.ADLESS_EXPERIENCE, SITE_FEATURES.PREMIUM_CONTENT_ACCESS];
 
+  test("should initialize object by providing { value } only", () => {
+    const header = new ServerHeader({ value: "ZBhyPJ1VS5W5zrxNvf/IEg^1^3" });
+    expect(header.value).toEqual("ZBhyPJ1VS5W5zrxNvf/IEg^1^3");
+  });
+
   test("should generate a valid welcome header", () => {
-    const header = new ServerHeader(siteId, features);
+    const header = new ServerHeader({ siteId, features });
     expect(header.value).toEqual("ZBhyPJ1VS5W5zrxNvf/IEg^1^3");
   });
 

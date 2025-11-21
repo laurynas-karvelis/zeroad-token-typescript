@@ -26,6 +26,17 @@ export enum PROTOCOL_VERSION {
 
 export const CURRENT_PROTOCOL_VERSION = PROTOCOL_VERSION.V_1;
 
+export type ServerHeaderSimpleOptions = {
+  value: string;
+};
+
+export type ServerHeaderExtendedOptions = {
+  siteId: UUID;
+  features: SITE_FEATURES[];
+};
+
+export type ServerHeaderOptions = ServerHeaderExtendedOptions | ServerHeaderSimpleOptions;
+
 export type WelcomeHeaderParseResult = WelcomeHeader | undefined;
 export type WelcomeHeader = {
   version: PROTOCOL_VERSION;

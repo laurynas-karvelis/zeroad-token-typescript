@@ -4,16 +4,17 @@ const {
   getServerHeaderName,
   getServerHeaderValue,
   processRequest,
-  constants,
   getClientHeaderName,
+  SERVER_HEADERS,
+  CLIENT_HEADERS,
 } = require("../dist/index.cjs");
 
 (async () => {
   const siteId = "EF005186-B911-4D77-83BD-A7D4E93F6124";
   init({ siteId, features: [constants.SITE_FEATURES.ADLESS_EXPERIENCE] });
 
-  assert.equal(getServerHeaderName(), constants.SERVER_HEADERS.WELCOME);
-  assert.equal(getClientHeaderName(), constants.CLIENT_HEADERS.HELLO);
+  assert.equal(getServerHeaderName(), SERVER_HEADERS.WELCOME);
+  assert.equal(getClientHeaderName(), CLIENT_HEADERS.HELLO);
   assert.equal(getServerHeaderValue(), "7wBRhrkRTXeDvafU6T9hJA^1^1");
 
   const result = await processRequest(

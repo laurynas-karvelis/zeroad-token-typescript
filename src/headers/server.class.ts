@@ -3,6 +3,7 @@ import {
   PROTOCOL_VERSION,
   SERVER_HEADERS,
   SITE_FEATURES,
+  ServerHeaderOptions,
   UUID,
   WelcomeHeaderParseResult,
 } from "../constants";
@@ -15,8 +16,13 @@ export class ServerHeader {
   name = SERVER_HEADERS.WELCOME;
   value: string;
 
-  constructor(siteId: UUID, features: SITE_FEATURES[]) {
-    this.value = this.encode(siteId, features);
+  constructor(options: ServerHeaderOptions) {
+    if ("value" in options) {
+      this.value = options.value;
+    } else {
+      const { siteId, features } = options;
+      this.value = this.encode(siteId, features);
+    }
   }
 
   encode(siteId: UUID, features: SITE_FEATURES[]) {

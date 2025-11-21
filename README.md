@@ -46,7 +46,6 @@ Take the example as a reference only. The most basic, and honestly, quite comple
 import express from "express";
 import {
   init,
-  constants,
   getServerHeaderName,
   getServerHeaderValue,
   processRequest,
@@ -56,6 +55,12 @@ import {
 const app = express();
 const port = 3000;
 
+// Welcome Header Value acquired during Site Registration process at Zero Ad Network platform
+const ZERO_AD_PARTNER_HEADER_VALUE = "AZqnKU56eIC7vCD1PPlwhg^1^3";
+
+// Initialize your Zero Ad Network module
+init(ZERO_AD_PARTNER_HEADER_VALUE);
+
 app
     .use((req, res, next) => {
         // X-Better-Web-Welcome header injection can could have it's own simple middleware like this:
@@ -64,17 +69,17 @@ app
     .use((req, res, next) => {
         const result = await processRequest(c.req.header(getClientHeaderName()));
 
-        res.locals._disableAds = result.shouldRemoveAds();
-        res.locals._removePaywalls = result.shouldEnablePremiumContentAccess();
-        res.locals._vipExperience = result.shouldEnableVipExperience();
+        res.locals.disableAds = result.shouldRemoveAds();
+        res.locals.removePaywalls = result.shouldEnablePremiumContentAccess();
+        res.locals.vipExperience = result.shouldEnableVipExperience();
 
         next();
     })
     .get('/', (req, res) => {
-        // The "locals._disableAds" variable can now be used to suppress rendering
+        // The "locals.disableAds" variable can now be used to suppress rendering
         // of ads and 3rd party non-functional trackers.
 
-        // The "locals._removePaywalls" variable can allow users to bypass pay-walled content.
+        // The "locals.removePaywalls" variable can allow users to bypass pay-walled content.
         res.render('index.ejs');
     });
 
