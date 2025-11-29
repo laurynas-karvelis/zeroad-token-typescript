@@ -91,7 +91,7 @@ app.listen(port, () => {
 });
 ```
 
-For more example implementations such as `Express.js`, `Hono` or `Fastify`, please go to [see more examples](https://github.com/laurynas-karvelis/zeroad-token/tree/main/examples/).
+For more example implementations such as `Express.js`, `Hono` or `Fastify`, please go to [see more examples](https://github.com/laurynas-karvelis/zeroad-token-ts/tree/main/examples/).
 
 P.S.: Each web request coming from active subscriber using their Zero Ad Network browser extension will incur a tiny fraction of CPU computation cost to verify the token data matches its encrypted signature. On modern web infrastructure a request execution time will increase roughly by ~0.08ms to 0.2ms or so. Mileage might vary, but the impact is minimal.
 
