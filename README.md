@@ -1,6 +1,6 @@
 ## Introduction
 
-**@zeroad.network/token** is a TypeScript ready module meant to be used by partnering sites of [Zero Ad Network](https://zeroad.network) platform. It's a lightweight module that works on Nodejs 18 and above, and Bun 1.3 and above runtimes.
+**@zeroad.network/token** is a TypeScript ready module meant to be used by partnering sites of [Zero Ad Network](https://zeroad.network) platform. It's a lightweight module that works on Nodejs v18 and above, Bun v1.3 and above, and Deno v1.33 and above runtimes.
 
 This module allows a Zero Ad Network program partnering sites and Web APIs to verify determine if incoming web requests are coming from our browser extension users with active subscription.
 
