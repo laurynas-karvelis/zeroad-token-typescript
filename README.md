@@ -1,6 +1,6 @@
 # Introduction
 
-This NPM module is meant to be used by sites, participating in [Zero Ad Network](https://zeroad.network) program, that are running in either Node.js, Bun or Deno runtimes. The `@zeroad.network/token` module a lightweight, TypeScript ready, fully open source, is well tested and has no production dependencies.
+This NPM module is meant to be used by sites participating in [Zero Ad Network](https://zeroad.network) program, that are running in either Node.js, Bun or Deno runtimes. The `@zeroad.network/token` module is a lightweight, TypeScript ready, fully open source, well tested and has no production dependencies.
 
 You will find the official Zero Ad Network documentation at [docs.zeroad.network](https://docs.zeroad.network). Up-to-date and in depth guides, how-to's and platform implementation details can be found there.
 
@@ -29,10 +29,10 @@ It helps partnered site developer to:
 
 ## Implementation details
 
-The modules uses `node:crypto` runtime module to ensure user's Request Header payload is valid by verifying its signature for the payload using Zero Ad Network's public ED25519 cryptographic key which is supplied within the module. Then:
+The module uses the `node:crypto` runtime module to ensure the user's Request Header payload is valid by verifying its signature for the payload using Zero Ad Network's public ED25519 cryptographic key which is supplied within the module. Then:
 
 - User's token payload is decoded and token's protocol version, expiration timestamp and site's feature list are extracted.
-- A map of site's features and their toggle states is generated.
+- A map of the site's features and their toggle states is generated.
 - An expired token will produce a feature list with all flags being set to `false`.
 
 Parsed token result example:
@@ -47,11 +47,11 @@ Parsed token result example:
 };
 ```
 
-User's token payload verification is done locally on within your app and no data leaves your server.
+User's token payload verification is done locally within your app and no data leaves your server.
 
 When a token is present, parsing and token integrity verification will roughly add between `0.06ms` to `0.6ms` to the total endpoint execution time (as per testing done on a M1 MacBook Pro). Your mileage will vary depending on your hardware, but the impact should stay minimal.
 
-As per our exploratory test results in attempts to cache token and its parsed results in Redis - it takes longer to retrieve the cached result than to verify token payload integrity.
+As per our exploratory test results in attempts to cache the token and its parsed results in Redis - it takes longer to retrieve the cached result than to verify token payload integrity.
 
 ## Why to join
 
@@ -63,7 +63,7 @@ With every new site joining us, it becomes easier to reshape the internet closer
 
 To register your site, [sign up](https://zeroad.network/login) with Zero Ad Network and [register your site](https://zeroad.network/publisher/sites/add). On the second step of the Site registration process you'll be provided with your unique `X-Better-Web-Welcome` header value.
 
-If you decide for your site to participate in Zero Ad Network program, then it must respond with this header at all times on every publicly accessible endpoint containing HTML or RESTful response. When Zero Ad Network users visit your site, this allows their browser extension to know your site is participating in the program.
+If you decide for your site to participate in the Zero Ad Network program, then it must respond with this header at all times on every publicly accessible endpoint containing HTML or RESTful response. When Zero Ad Network users visit your site, this allows their browser extension to know your site is participating in the program.
 
 ## Module installation
 
