@@ -85,7 +85,7 @@ app.get("/json", (c) => {
 });
 
 // -----------------------------------------------------------------------------
-// Start server (for Node.js)
+// Start server (for Bun.js)
 
 Bun.serve({ fetch: app.fetch, port: 3000 });
 
