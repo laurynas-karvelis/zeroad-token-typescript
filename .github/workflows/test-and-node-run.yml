@@ -117,10 +117,10 @@ jobs:
 
       - name: Run .mjs file
         run: |
-          echo "Running ESM import test on ${{ deno.deno-version }}"
+          echo "Running ESM import test on ${{ matrix.deno-version }}"
           deno run smoke-tests/esm-import.mjs
 
       - name: Run .cjs file
         run: |
-          echo "Running CJS require test on ${{ deno.deno-version }}"
+          echo "Running CJS require test on ${{ matrix.deno-version }}"
           deno run smoke-tests/cjs-require.cjs
