@@ -11,7 +11,6 @@ import { Site, FEATURES, SERVER_HEADERS, CLIENT_HEADERS } from "../dist/index.mj
 
   assert.equal(site.SERVER_HEADER_NAME, SERVER_HEADERS.WELCOME);
   assert.equal(site.CLIENT_HEADER_NAME, CLIENT_HEADERS.HELLO);
-  // cspell:disable-next-line
   assert.equal(site.SERVER_HEADER_VALUE, `${clientId}^1^1`);
 
   const validHeaderValue =
