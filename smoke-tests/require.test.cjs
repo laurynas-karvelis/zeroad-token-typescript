@@ -17,12 +17,12 @@ const { Site, FEATURES, SERVER_HEADERS, CLIENT_HEADERS } = require("../dist/inde
     "AbXze/EaFy9pEwAAAA==.hQHwRDR4i8wCV8+gYUxgFGd2yXHUMORnhetz+5Aloc84d3vz1dyGi3GDZ5Y4USc2RemCzYaKLltsi+Iu6NJMAQ==";
 
   assert.deepEqual(site.parseClientToken(validHeaderValue), {
-    ADVERTISEMENTS: true,
-    COOKIE_CONSENT_SCREEN: true,
-    NON_FUNCTIONAL_TRACKING: true,
-    MARKETING_DIALOGS: true,
-    CONTENT_PAYWALL: true,
-    SUBSCRIPTION_ACCESS: false,
+    HIDE_ADVERTISEMENTS: false,
+    HIDE_COOKIE_CONSENT_SCREEN: false,
+    HIDE_MARKETING_DIALOGS: false,
+    DISABLE_NON_FUNCTIONAL_TRACKING: false,
+    DISABLE_CONTENT_PAYWALL: false,
+    ENABLE_SUBSCRIPTION_ACCESS: false,
   });
 
   console.info("Passed.");
