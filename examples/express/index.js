@@ -33,10 +33,10 @@ const app = express();
 app.use(tokenMiddleware);
 
 app.get("/", (req, res) => {
-  // Access parsed tokenContext for this request
+  // Access parsed `tokenContext` for this request
   const tokenContext = req.tokenContext;
 
-  // Render HTML template using tokenContext to adjust feature display
+  // Render HTML template using `tokenContext` to adjust feature display
   const state = (value) => (value && '<b style="background: #b0b0b067">YES</b>') || "NO";
   const template = `
     <html>
@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/json", (req, res) => {
-  // Return JSON response with tokenContext for API usage
+  // Return JSON response with `tokenContext` for API usage
   res.json({
     message: "OK",
     tokenContext: req.tokenContext,

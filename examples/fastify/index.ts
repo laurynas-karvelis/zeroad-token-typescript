@@ -31,7 +31,7 @@ app.addHook("onRequest", async (request, reply) => {
   // Inject the "X-Better-Web-Welcome" server header into every response
   reply.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
 
-  // Parse incoming user token from client header
+  // Parse the incoming user token from the client header
   // Attach parsed token data to request for downstream use
   request.tokenContext = site.parseClientToken(request.headers[site.CLIENT_HEADER_NAME]);
 });
@@ -40,10 +40,10 @@ app.addHook("onRequest", async (request, reply) => {
 // Routes
 // -----------------------------------------------------------------------------
 app.get("/", async (request, reply) => {
-  // Access parsed tokenContext for this request
+  // Access parsed `tokenContext` for this request
   const tokenContext = request.tokenContext;
 
-  // Render HTML template using tokenContext to display site feature states
+  // Render HTML template using `tokenContext` to adjust feature display
   const state = (value: boolean) => (value && '<b style="background: #b0b0b067">YES</b>') || "NO";
   const template = `
     <html>
@@ -69,7 +69,7 @@ app.get("/", async (request, reply) => {
 });
 
 app.get("/json", async (request) => {
-  // Return JSON response with tokenContext for API usage
+  // Return JSON response with `tokenContext` for API usage
   return {
     message: "OK",
     tokenContext: request.tokenContext,

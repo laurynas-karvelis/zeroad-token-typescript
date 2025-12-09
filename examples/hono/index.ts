@@ -22,13 +22,13 @@ const app = new Hono<{ Variables: { tokenContext: TokenContext } }>();
 // Middleware
 // -----------------------------------------------------------------------------
 app.use("*", async (c: Context, next: Next) => {
-  // Inject "X-Better-Web-Welcome" server header into every response
+  // Inject the "X-Better-Web-Welcome" server header into every response
   c.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
 
-  // Parse incoming user token from client header
+  // Parse the incoming user token from the client header
   const tokenContext = site.parseClientToken(c.req.header(site.CLIENT_HEADER_NAME));
 
-  // Attach parsed token info to context for downstream usage
+  // Attach parsed token data to request for downstream use
   c.set("tokenContext", tokenContext);
 
   await next();
@@ -38,9 +38,10 @@ app.use("*", async (c: Context, next: Next) => {
 // Routes
 // -----------------------------------------------------------------------------
 app.get("/", (c) => {
+  // Access parsed `tokenContext` for this request
   const tokenContext = c.get("tokenContext");
 
-  // Render HTML template using tokenContext to display site feature states
+  // Render HTML template using `tokenContext` to adjust feature display
   const state = (value: boolean) => (value && '<b style="background: #b0b0b067">YES</b>') || "NO";
   const template = `
     <html>
@@ -66,7 +67,7 @@ app.get("/", (c) => {
 });
 
 app.get("/json", (c) => {
-  // Return JSON response with tokenContext for API usage
+  // Return JSON response with `tokenContext` for API usage
   const tokenContext = c.get("tokenContext");
   return c.json({
     message: "OK",
@@ -75,7 +76,7 @@ app.get("/json", (c) => {
 });
 
 // -----------------------------------------------------------------------------
-// Start server (for Bun.js)
+// Start Hono server (for Bun.js)
 // -----------------------------------------------------------------------------
 Bun.serve({ fetch: app.fetch, port: 3000 });
 

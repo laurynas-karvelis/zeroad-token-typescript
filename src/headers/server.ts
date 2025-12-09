@@ -1,9 +1,8 @@
 import { CURRENT_PROTOCOL_VERSION, PROTOCOL_VERSION, FEATURES } from "../constants";
-import { assert, getSiteFeaturesNative, hasFlag, setFlags } from "../helpers";
+import { assert, FEATURE_MAP, hasFlag, setFlags } from "../helpers";
 import { log } from "../logger";
 
 const SEPARATOR = "^";
-const SITE_FEATURES_NATIVE = getSiteFeaturesNative();
 
 const validFeatureValues = Object.values(FEATURES).filter((key) => !isNaN(Number(key))) as FEATURES[];
 const validFeatureKeys = Object.values(FEATURES).filter((key) => isNaN(Number(key))) as FEATURES[];
@@ -45,9 +44,9 @@ export function decodeServerHeader(headerValue: string | null | undefined): Welc
 
     assert(Number(flags).toFixed(0).toString() === flags, "Invalid flags number");
 
-    let features: (keyof typeof FEATURES)[] = [];
-    for (const [feature, shift] of SITE_FEATURES_NATIVE) {
-      if (hasFlag(Number(flags), shift)) features.push(feature);
+    const features: (keyof typeof FEATURES)[] = [];
+    for (const [feature, bit] of FEATURE_MAP()) {
+      if (hasFlag(Number(flags), bit)) features.push(feature);
     }
 
     return {

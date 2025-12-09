@@ -11,7 +11,7 @@ import {
 
 const keyCache = new Map<string, KeyObject>();
 
-export const generateKeys = () => {
+export function generateKeys() {
   const { publicKey, privateKey } = generateKeyPairSync("ed25519");
 
   const privateBase64 = privateKey.export({ format: "der", type: "pkcs8" }).toString("base64");
@@ -21,9 +21,21 @@ export const generateKeys = () => {
     privateKey: privateBase64,
     publicKey: publicBase64,
   };
-};
+}
 
-const importPrivateKey = (privateKeyBase64: string) => {
+export function sign(data: ArrayBuffer, privateKey: string) {
+  const key = importPrivateKey(privateKey);
+  return nodeSign(null, Buffer.from(data), key);
+}
+
+export function verify(data: ArrayBuffer, signature: ArrayBuffer, publicKey: string) {
+  const key = importPublicKey(publicKey);
+  return nodeVerify(null, Buffer.from(data), key, Buffer.from(signature));
+}
+
+export const nonce = (size: number) => new Uint8Array(randomBytes(size));
+
+function importPrivateKey(privateKeyBase64: string) {
   if (keyCache.has(privateKeyBase64)) return keyCache.get(privateKeyBase64) as KeyObject;
 
   const key = createPrivateKey({
@@ -34,9 +46,9 @@ const importPrivateKey = (privateKeyBase64: string) => {
 
   keyCache.set(privateKeyBase64, key);
   return key;
-};
+}
 
-const importPublicKey = (publicKeyBase64: string) => {
+function importPublicKey(publicKeyBase64: string) {
   if (keyCache.has(publicKeyBase64)) return keyCache.get(publicKeyBase64) as KeyObject;
 
   const key = createPublicKey({
@@ -47,16 +59,4 @@ const importPublicKey = (publicKeyBase64: string) => {
 
   keyCache.set(publicKeyBase64, key);
   return key;
-};
-
-export const sign = (data: ArrayBuffer, privateKey: string) => {
-  const key = importPrivateKey(privateKey);
-  return nodeSign(null, Buffer.from(data), key);
-};
-
-export const verify = (data: ArrayBuffer, signature: ArrayBuffer, publicKey: string) => {
-  const key = importPublicKey(publicKey);
-  return nodeVerify(null, Buffer.from(data), key, Buffer.from(signature));
-};
-
-export const nonce = (size: number) => new Uint8Array(randomBytes(size));
+}

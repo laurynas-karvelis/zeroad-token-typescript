@@ -1,13 +1,11 @@
 import { PROTOCOL_VERSION, FEATURES } from "../constants";
-import { fromBase64, getSiteFeaturesNative, hasFlag, setFlags, toBase64 } from "../helpers";
+import { FEATURE_MAP, fromBase64, hasFlag, setFlags, toBase64 } from "../helpers";
 import { nonce, sign, verify } from "../crypto";
 import { log } from "../logger";
 
 const VERSION_BYTES = 1;
 const NONCE_BYTES = 4;
 const SEPARATOR = ".";
-
-const SITE_FEATURES_NATIVE = getSiteFeaturesNative();
 
 export type FEATURE_FLAG =
   | "HIDE_ADVERTISEMENTS"
@@ -32,7 +30,11 @@ export function parseClientToken(headerValue: ClientHeaderValue, clientId: strin
   // Test if developer token is provided and granted `clientId` matches current `clientId`
   if (flags && data?.clientId && data.clientId !== clientId) flags = 0;
 
-  const features = SITE_FEATURES_NATIVE.map(([feature, shift]) => hasFlag(flags, shift) && feature).filter((e) => !!e);
+  const features: (keyof typeof FEATURES)[] = [];
+  for (const [feature, bit] of FEATURE_MAP()) {
+    if (hasFlag(Number(flags), bit)) features.push(feature);
+  }
+
   const hasCleanWeb = features.includes("CLEAN_WEB");
   const hasOnePass = features.includes("ONE_PASS");
 
