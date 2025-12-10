@@ -12,8 +12,8 @@ export function Site(options: SiteOptions) {
 
   return {
     parseClientToken: (headerValue: ClientHeaderValue) =>
-      parseClientToken(headerValue, options.clientId, ZEROAD_NETWORK_PUBLIC_KEY),
-    CLIENT_HEADER_NAME: CLIENT_HEADERS.HELLO,
+      parseClientToken(headerValue, { clientId: options.clientId, features: options.features }),
+    CLIENT_HEADER_NAME: CLIENT_HEADERS.HELLO.toLowerCase(),
     SERVER_HEADER_NAME: SERVER_HEADERS.WELCOME,
     SERVER_HEADER_VALUE: serverHeaderValue,
   };

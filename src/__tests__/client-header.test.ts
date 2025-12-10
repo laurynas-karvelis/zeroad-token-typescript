@@ -80,12 +80,13 @@ describe("Client Headers", () => {
   });
 
   describe("parseClientToken()", () => {
-    test("should construct correct output when token has only CLEAN_WEB feature", () => {
+    test("should construct correct output when token and site both have CLEAN_WEB feature", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
       const features = [FEATURES.CLEAN_WEB];
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
-      expect(parseClientToken(headerValue, clientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken(headerValue, { clientId, publicKey, features });
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: true,
         HIDE_COOKIE_CONSENT_SCREEN: true,
         HIDE_MARKETING_DIALOGS: true,
@@ -95,12 +96,13 @@ describe("Client Headers", () => {
       });
     });
 
-    test("should construct correct output when token has only ONE_PASS feature", () => {
+    test("should construct correct output when token and site both have ONE_PASS feature", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
       const features = [FEATURES.ONE_PASS];
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
-      expect(parseClientToken(headerValue, clientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken(headerValue, { clientId, publicKey, features });
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,
         HIDE_MARKETING_DIALOGS: false,
@@ -110,12 +112,17 @@ describe("Client Headers", () => {
       });
     });
 
-    test("should construct correct output when token has both CLEAN_WEB and ONE_PASS features", () => {
+    test("should construct correct output when token and site both have CLEAN_WEB and ONE_PASS features", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
       const features = [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS];
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
-      expect(parseClientToken(headerValue, clientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features,
+      });
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: true,
         HIDE_COOKIE_CONSENT_SCREEN: true,
         HIDE_MARKETING_DIALOGS: true,
@@ -125,12 +132,109 @@ describe("Client Headers", () => {
       });
     });
 
-    test("should construct correct output when token has no features", () => {
+    test("should construct correct output when token has CLEAN_WEB and site has ONE_PASS feature", () => {
+      const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
+      const headerValue = encodeClientHeader(
+        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURES.CLEAN_WEB] },
+        privateKey
+      );
+
+      const tokenContext = parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features: [FEATURES.ONE_PASS],
+      });
+
+      expect(tokenContext).toEqual({
+        HIDE_ADVERTISEMENTS: false,
+        HIDE_COOKIE_CONSENT_SCREEN: false,
+        HIDE_MARKETING_DIALOGS: false,
+        DISABLE_NON_FUNCTIONAL_TRACKING: false,
+        DISABLE_CONTENT_PAYWALL: false,
+        ENABLE_SUBSCRIPTION_ACCESS: false,
+      });
+    });
+
+    test("should construct correct output when token has ONE_PASS and site has CLEAN_WEB feature", () => {
+      const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
+      const headerValue = encodeClientHeader(
+        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURES.ONE_PASS] },
+        privateKey
+      );
+
+      const tokenContext = parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features: [FEATURES.CLEAN_WEB],
+      });
+
+      expect(tokenContext).toEqual({
+        HIDE_ADVERTISEMENTS: false,
+        HIDE_COOKIE_CONSENT_SCREEN: false,
+        HIDE_MARKETING_DIALOGS: false,
+        DISABLE_NON_FUNCTIONAL_TRACKING: false,
+        DISABLE_CONTENT_PAYWALL: false,
+        ENABLE_SUBSCRIPTION_ACCESS: false,
+      });
+    });
+
+    test("should construct correct output when token has both CLEAN_WEB and ONE_PASS but site has CLEAN_WEB feature only", () => {
+      const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
+      const headerValue = encodeClientHeader(
+        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS] },
+        privateKey
+      );
+
+      const tokenContext = parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features: [FEATURES.CLEAN_WEB],
+      });
+
+      expect(tokenContext).toEqual({
+        HIDE_ADVERTISEMENTS: true,
+        HIDE_COOKIE_CONSENT_SCREEN: true,
+        HIDE_MARKETING_DIALOGS: true,
+        DISABLE_NON_FUNCTIONAL_TRACKING: true,
+        DISABLE_CONTENT_PAYWALL: false,
+        ENABLE_SUBSCRIPTION_ACCESS: false,
+      });
+    });
+
+    test("should construct correct output when token has both CLEAN_WEB and ONE_PASS but site has ONE_PASS feature only", () => {
+      const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
+      const headerValue = encodeClientHeader(
+        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS] },
+        privateKey
+      );
+
+      const tokenContext = parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features: [FEATURES.ONE_PASS],
+      });
+
+      expect(tokenContext).toEqual({
+        HIDE_ADVERTISEMENTS: false,
+        HIDE_COOKIE_CONSENT_SCREEN: false,
+        HIDE_MARKETING_DIALOGS: false,
+        DISABLE_NON_FUNCTIONAL_TRACKING: false,
+        DISABLE_CONTENT_PAYWALL: true,
+        ENABLE_SUBSCRIPTION_ACCESS: true,
+      });
+    });
+
+    test("should construct correct output when token has no features while site supports all features", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
       const features: FEATURES[] = [];
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
-      expect(parseClientToken(headerValue, clientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+      });
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,
         HIDE_MARKETING_DIALOGS: false,
@@ -148,7 +252,8 @@ describe("Client Headers", () => {
         privateKey
       );
 
-      expect(parseClientToken(headerValue, clientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken(headerValue, { clientId, publicKey, features });
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: true,
         HIDE_COOKIE_CONSENT_SCREEN: true,
         HIDE_MARKETING_DIALOGS: true,
@@ -166,10 +271,11 @@ describe("Client Headers", () => {
         privateKey
       );
 
-      const serverClientId = randomUUID();
+      const differentClientId = randomUUID();
+      expect(clientId).not.toEqual(differentClientId);
 
-      expect(clientId).not.toBe(serverClientId);
-      expect(parseClientToken(headerValue, serverClientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken(headerValue, { clientId: differentClientId, publicKey, features });
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,
         HIDE_MARKETING_DIALOGS: false,
@@ -187,7 +293,8 @@ describe("Client Headers", () => {
         privateKey
       );
 
-      expect(parseClientToken(headerValue, clientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken(headerValue, { clientId, publicKey, features });
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,
         HIDE_MARKETING_DIALOGS: false,
@@ -198,7 +305,13 @@ describe("Client Headers", () => {
     });
 
     test("should not throw if array of strings is provided", () => {
-      expect(parseClientToken(["some-value", "another-value"], clientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken(["some-value", "another-value"], {
+        clientId,
+        publicKey,
+        features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+      });
+
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,
         HIDE_MARKETING_DIALOGS: false,
@@ -209,7 +322,13 @@ describe("Client Headers", () => {
     });
 
     test("should not throw if an empty array is provided", () => {
-      expect(parseClientToken([], clientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken([], {
+        clientId,
+        publicKey,
+        features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+      });
+
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,
         HIDE_MARKETING_DIALOGS: false,
@@ -220,7 +339,13 @@ describe("Client Headers", () => {
     });
 
     test("should not throw if an undefined param is provided", () => {
-      expect(parseClientToken(undefined, clientId, publicKey)).toEqual({
+      const tokenContext = parseClientToken(undefined, {
+        clientId,
+        publicKey,
+        features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+      });
+
+      expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,
         HIDE_MARKETING_DIALOGS: false,

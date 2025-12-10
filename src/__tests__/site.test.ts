@@ -32,11 +32,12 @@ describe("Site()", () => {
 
   test("should contain correct client hello header name", () => {
     const site = Site({ clientId, features: [FEATURES.CLEAN_WEB] });
-    expect(site.CLIENT_HEADER_NAME).toEqual(CLIENT_HEADERS.HELLO);
+    expect(site.CLIENT_HEADER_NAME).toEqual(CLIENT_HEADERS.HELLO.toLowerCase());
   });
 
   test("should call parseClientToken() correctly", () => {
-    const site = Site({ clientId, features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS] });
+    const features = [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS];
+    const site = Site({ clientId, features });
 
     const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
     const clientHeaderValue = encodeClientHeader(
@@ -48,7 +49,7 @@ describe("Site()", () => {
     const tokenContext = site.parseClientToken(clientHeaderValue);
 
     expect(clientHeader.parseClientToken).toHaveBeenCalledTimes(1);
-    expect(clientHeader.parseClientToken).toHaveBeenCalledWith(clientHeaderValue, clientId, ZEROAD_NETWORK_PUBLIC_KEY);
+    expect(clientHeader.parseClientToken).toHaveBeenCalledWith(clientHeaderValue, { clientId, features });
 
     expect(tokenContext).toEqual({
       DISABLE_CONTENT_PAYWALL: false,

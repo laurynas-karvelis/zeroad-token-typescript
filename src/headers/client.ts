@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION, FEATURES } from "../constants";
+import { PROTOCOL_VERSION, FEATURES, ZEROAD_NETWORK_PUBLIC_KEY } from "../constants";
 import { FEATURE_MAP, fromBase64, hasFlag, setFlags, toBase64 } from "../helpers";
 import { nonce, sign, verify } from "../crypto";
 import { log } from "../logger";
@@ -7,7 +7,7 @@ const VERSION_BYTES = 1;
 const NONCE_BYTES = 4;
 const SEPARATOR = ".";
 
-export type FEATURE_FLAG =
+export type FEATURE_ACTIONS =
   | "HIDE_ADVERTISEMENTS"
   | "HIDE_COOKIE_CONSENT_SCREEN"
   | "HIDE_MARKETING_DIALOGS"
@@ -16,11 +16,27 @@ export type FEATURE_FLAG =
   | "ENABLE_SUBSCRIPTION_ACCESS";
 
 export type ClientHeaderValue = string | string[] | undefined;
-export type FeatureFlags = Record<FEATURE_FLAG, boolean>;
+export type TokenContext = Record<FEATURE_ACTIONS, boolean>;
 
-export function parseClientToken(headerValue: ClientHeaderValue, clientId: string, publicKey: string): FeatureFlags {
+const FEATURES_TO_ACTIONS: Record<FEATURES, FEATURE_ACTIONS[]> = {
+  [FEATURES.CLEAN_WEB]: [
+    "HIDE_ADVERTISEMENTS",
+    "HIDE_COOKIE_CONSENT_SCREEN",
+    "HIDE_MARKETING_DIALOGS",
+    "DISABLE_NON_FUNCTIONAL_TRACKING",
+  ],
+  [FEATURES.ONE_PASS]: ["DISABLE_CONTENT_PAYWALL", "ENABLE_SUBSCRIPTION_ACCESS"],
+};
+
+export type ParseClientTokenOptions = {
+  clientId: string;
+  features: FEATURES[];
+  publicKey?: string;
+};
+
+export function parseClientToken(headerValue: ClientHeaderValue, options: ParseClientTokenOptions): TokenContext {
   const headerValueAsString = Array.isArray(headerValue) ? headerValue[0] : headerValue;
-  const data = decodeClientHeader(headerValueAsString, publicKey);
+  const data = decodeClientHeader(headerValueAsString, options.publicKey || ZEROAD_NETWORK_PUBLIC_KEY);
 
   let flags = 0;
 
@@ -28,24 +44,18 @@ export function parseClientToken(headerValue: ClientHeaderValue, clientId: strin
   if (data && data.expiresAt.getTime() >= Date.now()) flags = data.flags;
 
   // Test if developer token is provided and granted `clientId` matches current `clientId`
-  if (flags && data?.clientId && data.clientId !== clientId) flags = 0;
+  if (flags && data?.clientId && data.clientId !== options.clientId) flags = 0;
 
-  const features: (keyof typeof FEATURES)[] = [];
-  for (const [feature, bit] of FEATURE_MAP()) {
-    if (hasFlag(Number(flags), bit)) features.push(feature);
+  const context = new Map<FEATURE_ACTIONS, boolean>();
+  for (const [feature, actionNames] of Object.entries(FEATURES_TO_ACTIONS)) {
+    // Check if site supports the feature, of this token owner, is allowed to be enabled
+    const decision = options.features.includes(Number(feature)) && hasFlag(Number(feature), flags);
+    for (const actionName of actionNames) {
+      context.set(actionName, decision);
+    }
   }
 
-  const hasCleanWeb = features.includes("CLEAN_WEB");
-  const hasOnePass = features.includes("ONE_PASS");
-
-  return {
-    HIDE_ADVERTISEMENTS: hasCleanWeb,
-    HIDE_COOKIE_CONSENT_SCREEN: hasCleanWeb,
-    HIDE_MARKETING_DIALOGS: hasCleanWeb,
-    DISABLE_NON_FUNCTIONAL_TRACKING: hasCleanWeb,
-    DISABLE_CONTENT_PAYWALL: hasOnePass,
-    ENABLE_SUBSCRIPTION_ACCESS: hasOnePass,
-  };
+  return Object.fromEntries(context) as TokenContext;
 }
 
 export type DecodedClientHeader = {

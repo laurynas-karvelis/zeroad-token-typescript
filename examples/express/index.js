@@ -21,7 +21,9 @@ function tokenMiddleware(req, res, next) {
 
   // Parse the incoming user token from the client header
   // Attach parsed token data to request for downstream use
+  console.time("t1");
   req.tokenContext = site.parseClientToken(req.headers[site.CLIENT_HEADER_NAME]);
+  console.timeEnd("t1");
 
   next();
 }

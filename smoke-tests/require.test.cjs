@@ -10,13 +10,14 @@ const { Site, FEATURES, SERVER_HEADERS, CLIENT_HEADERS } = require("../dist/inde
   });
 
   assert.equal(site.SERVER_HEADER_NAME, SERVER_HEADERS.WELCOME);
-  assert.equal(site.CLIENT_HEADER_NAME, CLIENT_HEADERS.HELLO);
+  assert.equal(site.CLIENT_HEADER_NAME, CLIENT_HEADERS.HELLO.toLowerCase());
   assert.equal(site.SERVER_HEADER_VALUE, `${clientId}^1^1`);
 
   const validHeaderValue =
     "AbXze/EaFy9pEwAAAA==.hQHwRDR4i8wCV8+gYUxgFGd2yXHUMORnhetz+5Aloc84d3vz1dyGi3GDZ5Y4USc2RemCzYaKLltsi+Iu6NJMAQ==";
 
-  assert.deepEqual(site.parseClientToken(validHeaderValue), {
+  const tokenContext = site.parseClientToken(validHeaderValue);
+  assert.deepEqual(tokenContext, {
     HIDE_ADVERTISEMENTS: false,
     HIDE_COOKIE_CONSENT_SCREEN: false,
     HIDE_MARKETING_DIALOGS: false,
