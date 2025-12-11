@@ -13,11 +13,11 @@ export function encodeServerHeader(clientId: string, features: FEATURES[]) {
   }
 
   if (!features?.length) {
-    throw new Error("At least one Site feature must be provided");
+    throw new Error("At least one site feature must be provided");
   }
 
   if (features.filter((feature) => validFeatureValues.includes(feature)).length !== features.length) {
-    throw new Error(`Only valid Site features are allowed: ${validFeatureKeys.join(" | ")}`);
+    throw new Error(`Only valid site features are allowed: ${validFeatureKeys.join(" | ")}`);
   }
 
   return [clientId, CURRENT_PROTOCOL_VERSION, setFlags(features)].join(SEPARATOR);
