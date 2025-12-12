@@ -1,13 +1,7 @@
 import { randomUUID } from "crypto";
 import { describe, test, expect, beforeEach, spyOn } from "bun:test";
 import { generateKeys } from "../crypto";
-import {
-  CLIENT_HEADERS,
-  CURRENT_PROTOCOL_VERSION,
-  FEATURES,
-  SERVER_HEADERS,
-  ZEROAD_NETWORK_PUBLIC_KEY,
-} from "../constants";
+import { CLIENT_HEADERS, CURRENT_PROTOCOL_VERSION, FEATURES, SERVER_HEADERS } from "../constants";
 import { encodeClientHeader } from "../headers/client";
 import * as clientHeader from "../headers/client";
 import { Site } from "../site";

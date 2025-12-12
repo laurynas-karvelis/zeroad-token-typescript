@@ -1,5 +1,5 @@
 import { PROTOCOL_VERSION, FEATURES, ZEROAD_NETWORK_PUBLIC_KEY } from "../constants";
-import { FEATURE_MAP, fromBase64, hasFlag, setFlags, toBase64 } from "../helpers";
+import { fromBase64, hasFlag, setFlags, toBase64 } from "../helpers";
 import { nonce, sign, verify } from "../crypto";
 import { log } from "../logger";
 

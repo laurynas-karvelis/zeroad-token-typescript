@@ -1,4 +1,4 @@
-import { CLIENT_HEADERS, FEATURES, SERVER_HEADERS, ZEROAD_NETWORK_PUBLIC_KEY } from "./constants";
+import { CLIENT_HEADERS, FEATURES, SERVER_HEADERS } from "./constants";
 import { ClientHeaderValue, parseClientToken } from "./headers/client";
 import { encodeServerHeader } from "./headers/server";
 
