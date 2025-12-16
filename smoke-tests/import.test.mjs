@@ -1,16 +1,16 @@
 import assert from "node:assert";
 import { randomUUID } from "node:crypto";
-import { Site, FEATURES, SERVER_HEADERS, CLIENT_HEADERS } from "../dist/index.mjs";
+import { Site, FEATURE, SERVER_HEADER, CLIENT_HEADER } from "../dist/index.mjs";
 
 (() => {
   const clientId = randomUUID();
   const site = Site({
     clientId,
-    features: [FEATURES.CLEAN_WEB],
+    features: [FEATURE.CLEAN_WEB],
   });
 
-  assert.equal(site.SERVER_HEADER_NAME, SERVER_HEADERS.WELCOME);
-  assert.equal(site.CLIENT_HEADER_NAME, CLIENT_HEADERS.HELLO.toLowerCase());
+  assert.equal(site.SERVER_HEADER_NAME, SERVER_HEADER.WELCOME);
+  assert.equal(site.CLIENT_HEADER_NAME, CLIENT_HEADER.HELLO.toLowerCase());
   assert.equal(site.SERVER_HEADER_VALUE, `${clientId}^1^1`);
 
   const validHeaderValue =

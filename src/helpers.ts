@@ -1,16 +1,16 @@
-import { FEATURES } from "./constants";
+import { FEATURE } from "./constants";
 
-let cachedFeatures: Map<keyof typeof FEATURES, FEATURES>;
+let cachedFeatures: Map<keyof typeof FEATURE, FEATURE>;
 
 export function FEATURE_MAP() {
   if (cachedFeatures) return cachedFeatures;
 
-  cachedFeatures = new Map<keyof typeof FEATURES, FEATURES>();
-  for (const key of Object.keys(FEATURES)) {
+  cachedFeatures = new Map<keyof typeof FEATURE, FEATURE>();
+  for (const key of Object.keys(FEATURE)) {
     if (!isNaN(Number(key))) continue;
 
-    const typedKey = key as keyof typeof FEATURES;
-    cachedFeatures.set(typedKey, FEATURES[typedKey]);
+    const typedKey = key as keyof typeof FEATURE;
+    cachedFeatures.set(typedKey, FEATURE[typedKey]);
   }
 
   return cachedFeatures;
@@ -52,4 +52,4 @@ export function assert(value: unknown, message: string) {
 }
 
 export const hasFlag = (bit: number, flags: number) => Boolean(bit & flags);
-export const setFlags = (features: FEATURES[] = []) => features.reduce((acc, feature) => acc | feature, 0);
+export const setFlags = (features: FEATURE[] = []) => features.reduce((acc, feature) => acc | feature, 0);

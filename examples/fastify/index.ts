@@ -1,7 +1,7 @@
 import path from "node:path";
 import { Eta } from "eta";
-import Fastify from "fastify";
-import { Site, FEATURES } from "@zeroad.network/token";
+import Fastify, { FastifyReply, FastifyRequest } from "fastify";
+import { Site, FEATURE } from "@zeroad.network/token";
 
 /**
  * Module initialization (once at startup)
@@ -11,7 +11,7 @@ const site = Site({
   // Pass in `clientId` you received registering your site on Zero Ad Network platform
   clientId: "DEMO-Z2CclA8oXIT1e0Qmq",
   // Specify supported site features only
-  features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+  features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
 });
 
 // -----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ declare module "fastify" {
 // -----------------------------------------------------------------------------
 // Middleware (Fastify hook)
 // -----------------------------------------------------------------------------
-app.addHook("onRequest", async (request, reply) => {
+app.addHook("onRequest", async (request: FastifyRequest, reply: FastifyReply) => {
   // Inject the "X-Better-Web-Welcome" server header into every response
   reply.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
 
@@ -42,12 +42,12 @@ app.addHook("onRequest", async (request, reply) => {
 // -----------------------------------------------------------------------------
 // Routes
 // -----------------------------------------------------------------------------
-app.get("/", async (request, reply) => {
+app.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
   // Access parsed `tokenContext` for this request
   reply.type("text/html").send(eta.render("./homepage", { tokenContext: request.tokenContext }));
 });
 
-app.get("/json", async (request) => {
+app.get("/json", async (request: FastifyRequest) => {
   // Return JSON response with `tokenContext` for API usage
   return {
     message: "OK",

@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
 import { describe, test, expect, beforeEach } from "bun:test";
-import { CURRENT_PROTOCOL_VERSION, FEATURES, ZEROAD_NETWORK_PUBLIC_KEY } from "../constants";
-import { generateKeys } from "../crypto";
 import { decodeClientHeader, encodeClientHeader, parseClientToken } from "../headers/client";
+import { CURRENT_PROTOCOL_VERSION, FEATURE, ZEROAD_NETWORK_PUBLIC_KEY } from "../constants";
+import { generateKeys } from "../crypto";
 
 describe("Client Headers", () => {
   let privateKey: string;
@@ -21,7 +21,7 @@ describe("Client Headers", () => {
   describe("decodeClientHeader()", () => {
     test("should generate a valid header value", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
-      const features = [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS];
+      const features = [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS];
 
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
@@ -36,7 +36,7 @@ describe("Client Headers", () => {
 
     test("should include `clientId` when client token contains it", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
-      const features: FEATURES[] = [];
+      const features: FEATURE[] = [];
 
       const headerValue = encodeClientHeader(
         { version: CURRENT_PROTOCOL_VERSION, expiresAt, features, clientId },
@@ -55,7 +55,7 @@ describe("Client Headers", () => {
 
     test("should generate a valid header value with expired token", () => {
       const expiresAt = new Date(Date.now() - 24 * 3600 * 1000);
-      const features = [FEATURES.CLEAN_WEB];
+      const features = [FEATURE.CLEAN_WEB];
 
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
@@ -70,7 +70,7 @@ describe("Client Headers", () => {
 
     test("should parse as undefined on a forged header value", () => {
       const expiresAt = new Date(Date.now() - 24 * 3600 * 1000);
-      const features = [FEATURES.CLEAN_WEB];
+      const features = [FEATURE.CLEAN_WEB];
 
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
@@ -82,7 +82,7 @@ describe("Client Headers", () => {
   describe("parseClientToken()", () => {
     test("should construct correct output when token and site both have CLEAN_WEB feature", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
-      const features = [FEATURES.CLEAN_WEB];
+      const features = [FEATURE.CLEAN_WEB];
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
       const tokenContext = parseClientToken(headerValue, { clientId, publicKey, features });
@@ -98,7 +98,7 @@ describe("Client Headers", () => {
 
     test("should construct correct output when token and site both have ONE_PASS feature", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
-      const features = [FEATURES.ONE_PASS];
+      const features = [FEATURE.ONE_PASS];
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
       const tokenContext = parseClientToken(headerValue, { clientId, publicKey, features });
@@ -114,7 +114,7 @@ describe("Client Headers", () => {
 
     test("should construct correct output when token and site both have CLEAN_WEB and ONE_PASS features", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
-      const features = [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS];
+      const features = [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS];
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
       const tokenContext = parseClientToken(headerValue, {
@@ -135,14 +135,14 @@ describe("Client Headers", () => {
     test("should construct correct output when token has CLEAN_WEB and site has ONE_PASS feature", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
       const headerValue = encodeClientHeader(
-        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURES.CLEAN_WEB] },
+        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURE.CLEAN_WEB] },
         privateKey
       );
 
       const tokenContext = parseClientToken(headerValue, {
         clientId,
         publicKey,
-        features: [FEATURES.ONE_PASS],
+        features: [FEATURE.ONE_PASS],
       });
 
       expect(tokenContext).toEqual({
@@ -158,14 +158,14 @@ describe("Client Headers", () => {
     test("should construct correct output when token has ONE_PASS and site has CLEAN_WEB feature", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
       const headerValue = encodeClientHeader(
-        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURES.ONE_PASS] },
+        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURE.ONE_PASS] },
         privateKey
       );
 
       const tokenContext = parseClientToken(headerValue, {
         clientId,
         publicKey,
-        features: [FEATURES.CLEAN_WEB],
+        features: [FEATURE.CLEAN_WEB],
       });
 
       expect(tokenContext).toEqual({
@@ -181,14 +181,14 @@ describe("Client Headers", () => {
     test("should construct correct output when token has both CLEAN_WEB and ONE_PASS but site has CLEAN_WEB feature only", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
       const headerValue = encodeClientHeader(
-        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS] },
+        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS] },
         privateKey
       );
 
       const tokenContext = parseClientToken(headerValue, {
         clientId,
         publicKey,
-        features: [FEATURES.CLEAN_WEB],
+        features: [FEATURE.CLEAN_WEB],
       });
 
       expect(tokenContext).toEqual({
@@ -204,14 +204,14 @@ describe("Client Headers", () => {
     test("should construct correct output when token has both CLEAN_WEB and ONE_PASS but site has ONE_PASS feature only", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
       const headerValue = encodeClientHeader(
-        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS] },
+        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS] },
         privateKey
       );
 
       const tokenContext = parseClientToken(headerValue, {
         clientId,
         publicKey,
-        features: [FEATURES.ONE_PASS],
+        features: [FEATURE.ONE_PASS],
       });
 
       expect(tokenContext).toEqual({
@@ -226,13 +226,13 @@ describe("Client Headers", () => {
 
     test("should construct correct output when token has no features while site supports all features", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
-      const features: FEATURES[] = [];
+      const features: FEATURE[] = [];
       const headerValue = encodeClientHeader({ version: CURRENT_PROTOCOL_VERSION, expiresAt, features }, privateKey);
 
       const tokenContext = parseClientToken(headerValue, {
         clientId,
         publicKey,
-        features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+        features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
       });
       expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
@@ -246,7 +246,7 @@ describe("Client Headers", () => {
 
     test("should construct correct output when token has clientId and server's clientId match", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
-      const features: FEATURES[] = [FEATURES.CLEAN_WEB];
+      const features: FEATURE[] = [FEATURE.CLEAN_WEB];
       const headerValue = encodeClientHeader(
         { version: CURRENT_PROTOCOL_VERSION, expiresAt, features, clientId },
         privateKey
@@ -265,7 +265,7 @@ describe("Client Headers", () => {
 
     test("should construct correct output when token has clientId and server's clientId do not match", () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000);
-      const features: FEATURES[] = [FEATURES.CLEAN_WEB];
+      const features: FEATURE[] = [FEATURE.CLEAN_WEB];
       const headerValue = encodeClientHeader(
         { version: CURRENT_PROTOCOL_VERSION, expiresAt, features, clientId },
         privateKey
@@ -287,7 +287,7 @@ describe("Client Headers", () => {
 
     test("should construct correct output when token is expired but clientId and server's clientId match", () => {
       const expiresAt = new Date(Date.now() - 24 * 3600 * 1000);
-      const features: FEATURES[] = [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS];
+      const features: FEATURE[] = [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS];
       const headerValue = encodeClientHeader(
         { version: CURRENT_PROTOCOL_VERSION, expiresAt, features, clientId },
         privateKey
@@ -308,7 +308,7 @@ describe("Client Headers", () => {
       const tokenContext = parseClientToken(["some-value", "another-value"], {
         clientId,
         publicKey,
-        features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+        features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
       });
 
       expect(tokenContext).toEqual({
@@ -325,7 +325,7 @@ describe("Client Headers", () => {
       const tokenContext = parseClientToken([], {
         clientId,
         publicKey,
-        features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+        features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
       });
 
       expect(tokenContext).toEqual({
@@ -342,7 +342,7 @@ describe("Client Headers", () => {
       const tokenContext = parseClientToken(undefined, {
         clientId,
         publicKey,
-        features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+        features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
       });
 
       expect(tokenContext).toEqual({

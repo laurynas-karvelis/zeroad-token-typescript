@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { Site } from "../site";
-import { setLogLevel } from "../logger";
-import { encodeServerHeader, decodeServerHeader } from "../headers/server";
 import { parseClientToken, encodeClientHeader, decodeClientHeader } from "../headers/client";
+import { encodeServerHeader, decodeServerHeader } from "../headers/server";
+import { setLogLevel } from "../logger";
 import * as module from "../index";
+import { Site } from "../site";
 
 describe("module", () => {
   test("exports expected module elements", () => {

@@ -1,7 +1,7 @@
 import path from "node:path";
 import { Eta } from "eta";
 import { Context, Hono, Next } from "hono";
-import { Site, FEATURES } from "@zeroad.network/token";
+import { Site, FEATURE } from "@zeroad.network/token";
 
 /**
  * Module initialization (once at startup)
@@ -11,13 +11,14 @@ const site = Site({
   // Pass in `clientId` you received registering your site on Zero Ad Network platform
   clientId: "DEMO-Z2CclA8oXIT1e0Qmq",
   // Specify supported site features only
-  features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+  features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
 });
 
 // -----------------------------------------------------------------------------
 // Hono app setup
 // -----------------------------------------------------------------------------
 type TokenContext = ReturnType<typeof site.parseClientToken>;
+
 const app = new Hono<{ Variables: { tokenContext: TokenContext } }>();
 const eta = new Eta({ views: path.join(import.meta.dirname, "../templates") });
 
@@ -40,12 +41,12 @@ app.use("*", async (c: Context, next: Next) => {
 // -----------------------------------------------------------------------------
 // Routes
 // -----------------------------------------------------------------------------
-app.get("/", (c) => {
+app.get("/", (c: Context) => {
   // Access parsed `tokenContext` for this request
   return c.html(eta.render("./homepage", { tokenContext: c.get("tokenContext") }));
 });
 
-app.get("/json", (c) => {
+app.get("/json", (c: Context) => {
   // Return JSON response with `tokenContext` for API usage
   return c.json({
     message: "OK",

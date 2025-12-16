@@ -10,7 +10,7 @@ export const ZEROAD_NETWORK_PUBLIC_KEY: string = "MCowBQYDK2VwAyEAignXRaTQtxEDl4
  * Failure to comply will result in the site getting banned from Zero Ad Network platform.
  */
 
-export enum FEATURES {
+export enum FEATURE {
   /**
    * Feature requirements:
    *  - Disable all advertisements on the page;
@@ -28,11 +28,11 @@ export enum FEATURES {
   ONE_PASS = 1 << 1,
 }
 
-export enum SERVER_HEADERS {
+export enum SERVER_HEADER {
   WELCOME = "X-Better-Web-Welcome",
 }
 
-export enum CLIENT_HEADERS {
+export enum CLIENT_HEADER {
   HELLO = "X-Better-Web-Hello",
 }
 

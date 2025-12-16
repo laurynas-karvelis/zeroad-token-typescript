@@ -120,7 +120,7 @@ const app = express();
 const ZERO_AD_NETWORK_CLIENT_ID = "DEMO-Z2CclA8oXIT1e0Qmq";
 const site = Site({
   clientId: ZERO_AD_NETWORK_CLIENT_ID,
-  features: [FEATURES.CLEAN_WEB, FEATURES.ONE_PASS],
+  features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
 });
 
 app

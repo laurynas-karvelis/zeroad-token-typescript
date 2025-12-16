@@ -1,10 +1,10 @@
-import { CLIENT_HEADERS, FEATURES, SERVER_HEADERS } from "./constants";
+import { CLIENT_HEADER, FEATURE, SERVER_HEADER } from "./constants";
 import { ClientHeaderValue, parseClientToken } from "./headers/client";
 import { encodeServerHeader } from "./headers/server";
 
 export type SiteOptions = {
   clientId: string;
-  features: FEATURES[];
+  features: FEATURE[];
 };
 
 export function Site(options: SiteOptions) {
@@ -13,8 +13,8 @@ export function Site(options: SiteOptions) {
   return {
     parseClientToken: (headerValue: ClientHeaderValue) =>
       parseClientToken(headerValue, { clientId: options.clientId, features: options.features }),
-    CLIENT_HEADER_NAME: CLIENT_HEADERS.HELLO.toLowerCase(),
-    SERVER_HEADER_NAME: SERVER_HEADERS.WELCOME,
+    CLIENT_HEADER_NAME: CLIENT_HEADER.HELLO.toLowerCase(),
+    SERVER_HEADER_NAME: SERVER_HEADER.WELCOME,
     SERVER_HEADER_VALUE: serverHeaderValue,
   };
 }

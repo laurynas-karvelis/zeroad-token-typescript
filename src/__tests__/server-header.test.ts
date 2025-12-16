@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { describe, test, expect, beforeEach } from "bun:test";
-import { FEATURES } from "../constants";
 import { decodeServerHeader, encodeServerHeader } from "../headers/server";
+import { FEATURE } from "../constants";
 
 describe("Server Header", () => {
   let clientId: string;
@@ -40,7 +40,7 @@ describe("Server Header", () => {
 
   describe("encodeServerHeader()", () => {
     test("should throw when no features are provided", () => {
-      expect(() => encodeServerHeader("", [FEATURES.CLEAN_WEB])).toThrow(
+      expect(() => encodeServerHeader("", [FEATURE.CLEAN_WEB])).toThrow(
         /The provided `clientId` value cannot be an empty string/
       );
     });
@@ -51,7 +51,7 @@ describe("Server Header", () => {
 
     test("should throw when no unsupported site features are provided", () => {
       expect(() =>
-        encodeServerHeader(clientId, ["not a real feature", FEATURES.CLEAN_WEB, "should fail"] as never)
+        encodeServerHeader(clientId, ["not a real feature", FEATURE.CLEAN_WEB, "should fail"] as never)
       ).toThrow(/Only valid site features are allowed: CLEAN_WEB | ONE_PASS/);
     });
   });

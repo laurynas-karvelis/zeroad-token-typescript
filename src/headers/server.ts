@@ -1,13 +1,13 @@
-import { CURRENT_PROTOCOL_VERSION, PROTOCOL_VERSION, FEATURES } from "../constants";
+import { CURRENT_PROTOCOL_VERSION, PROTOCOL_VERSION, FEATURE } from "../constants";
 import { assert, FEATURE_MAP, hasFlag, setFlags } from "../helpers";
 import { log } from "../logger";
 
 const SEPARATOR = "^";
 
-const validFeatureValues = Object.values(FEATURES).filter((key) => !isNaN(Number(key))) as FEATURES[];
-const validFeatureKeys = Object.values(FEATURES).filter((key) => isNaN(Number(key))) as FEATURES[];
+const validFeatureValues = Object.values(FEATURE).filter((key) => !isNaN(Number(key))) as FEATURE[];
+const validFeatureKeys = Object.values(FEATURE).filter((key) => isNaN(Number(key))) as FEATURE[];
 
-export function encodeServerHeader(clientId: string, features: FEATURES[]) {
+export function encodeServerHeader(clientId: string, features: FEATURE[]) {
   if (!clientId?.length) {
     throw new Error("The provided `clientId` value cannot be an empty string");
   }
@@ -26,7 +26,7 @@ export function encodeServerHeader(clientId: string, features: FEATURES[]) {
 export type WelcomeHeader = {
   clientId: string;
   version: PROTOCOL_VERSION;
-  features: (keyof typeof FEATURES)[];
+  features: (keyof typeof FEATURE)[];
 };
 
 export function decodeServerHeader(headerValue: string | null | undefined): WelcomeHeader | undefined {
@@ -44,7 +44,7 @@ export function decodeServerHeader(headerValue: string | null | undefined): Welc
 
     assert(Number(flags).toFixed(0).toString() === flags, "Invalid flags number");
 
-    const features: (keyof typeof FEATURES)[] = [];
+    const features: (keyof typeof FEATURE)[] = [];
     for (const [feature, bit] of FEATURE_MAP()) {
       if (hasFlag(Number(flags), bit)) features.push(feature);
     }
