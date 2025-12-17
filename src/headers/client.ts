@@ -90,7 +90,7 @@ export function decodeClientHeader(
       const expectedByteLength = VERSION_BYTES + NONCE_BYTES + Uint32Array.BYTES_PER_ELEMENT * 2;
 
       if (dataBytes.byteLength > expectedByteLength) {
-        // `clientId` is included
+        // The `clientId` is included
         clientId = new TextDecoder().decode(dataBytes.subarray(expectedByteLength));
       }
 

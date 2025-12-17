@@ -1,5 +1,5 @@
-import { CLIENT_HEADER, FEATURE, SERVER_HEADER } from "./constants";
 import { ClientHeaderValue, parseClientToken } from "./headers/client";
+import { CLIENT_HEADER, FEATURE, SERVER_HEADER } from "./constants";
 import { encodeServerHeader } from "./headers/server";
 
 export type SiteOptions = {
