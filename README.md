@@ -82,37 +82,37 @@ Decide which features your site will support:
 ### 3. Basic Implementation
 
 ```typescript
-import express from "express";
-import { Site, FEATURE } from "@zeroad.network/token";
+import express from "express"
+import { Site, FEATURE } from "@zeroad.network/token"
 
-const app = express();
+const app = express()
 
 // Initialize once at startup - this creates your site instance
 const site = Site({
   clientId: "YOUR_CLIENT_ID_HERE",
   features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
-});
+})
 
 // Middleware: Inject Welcome Header and parse user tokens
 app.use(async (req, res, next) => {
   // Tell the browser extension your site participates
-  res.set(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
+  res.set(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE)
 
   // Parse the user's subscription token
-  req.tokenContext = await site.parseClientToken(req.get(site.CLIENT_HEADER_NAME));
+  req.tokenContext = await site.parseClientToken(req.get(site.CLIENT_HEADER_NAME))
 
-  next();
-});
+  next()
+})
 
 // Use token context in your templates
 app.get("/", async (req, res) => {
   res.render("index", {
     // Pass token context to control what appears in templates
     tokenContext: req.tokenContext,
-  });
-});
+  })
+})
 
-app.listen(3000);
+app.listen(3000)
 ```
 
 ### 4. In Your Templates
@@ -163,14 +163,14 @@ After parsing, the token context contains boolean flags for each feature:
 ```typescript
 interface TokenContext {
   // CLEAN_WEB features
-  HIDE_ADVERTISEMENTS: boolean;
-  HIDE_COOKIE_CONSENT_SCREEN: boolean;
-  HIDE_MARKETING_DIALOGS: boolean;
-  DISABLE_NON_FUNCTIONAL_TRACKING: boolean;
+  HIDE_ADVERTISEMENTS: boolean
+  HIDE_COOKIE_CONSENT_SCREEN: boolean
+  HIDE_MARKETING_DIALOGS: boolean
+  DISABLE_NON_FUNCTIONAL_TRACKING: boolean
 
   // ONE_PASS features
-  DISABLE_CONTENT_PAYWALL: boolean;
-  ENABLE_SUBSCRIPTION_ACCESS: boolean;
+  DISABLE_CONTENT_PAYWALL: boolean
+  ENABLE_SUBSCRIPTION_ACCESS: boolean
 }
 ```
 
@@ -188,7 +188,7 @@ interface TokenContext {
 The module includes intelligent caching to minimize crypto operations. Configure caching when creating your site instance:
 
 ```typescript
-import { Site, FEATURE } from "@zeroad.network/token";
+import { Site, FEATURE } from "@zeroad.network/token"
 
 const site = Site({
   clientId: process.env.ZERO_AD_CLIENT_ID!,
@@ -198,7 +198,7 @@ const site = Site({
     ttl: 10000, // Cache tokens for 10 seconds
     maxSize: 500, // Store up to 500 unique tokens
   },
-});
+})
 ```
 
 **Cache Behavior:**
@@ -210,14 +210,14 @@ const site = Site({
 For more control, you can configure caching globally:
 
 ```typescript
-import { configureCaching } from "@zeroad.network/token";
+import { configureCaching } from "@zeroad.network/token"
 
 // Apply to all Site instances
 configureCaching({
   enabled: true,
   ttl: 5000,
   maxSize: 100,
-});
+})
 ```
 
 ## Security
@@ -288,7 +288,7 @@ configureCaching({
   enabled: true,
   ttl: 30000, // 30 seconds
   maxSize: 5000, // ~2.5MB memory
-});
+})
 ```
 
 The async crypto operations utilize Node.js libuv threadpool (4 threads by default), allowing ~8000 verifications/sec without blocking the event loop.
@@ -367,72 +367,72 @@ export default function Article({ article, tokenContext }) {
 ### Fastify
 
 ```typescript
-import Fastify from "fastify";
-import { Site, FEATURE } from "@zeroad.network/token";
+import Fastify from "fastify"
+import { Site, FEATURE } from "@zeroad.network/token"
 
-const fastify = Fastify();
+const fastify = Fastify()
 
 // Create site instance once
 const site = Site({
   clientId: process.env.ZERO_AD_CLIENT_ID!,
   features: [FEATURE.CLEAN_WEB],
-});
+})
 
 fastify.addHook("onRequest", async (request, reply) => {
-  reply.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
+  reply.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE)
 
-  request.tokenContext = await site.parseClientToken(request.headers[site.CLIENT_HEADER_NAME]);
-});
+  request.tokenContext = await site.parseClientToken(request.headers[site.CLIENT_HEADER_NAME])
+})
 
 fastify.get("/", async (request, reply) => {
   return reply.view("index", {
     tokenContext: request.tokenContext,
-  });
-});
+  })
+})
 
-await fastify.listen({ port: 3000 });
+await fastify.listen({ port: 3000 })
 ```
 
 ### Hono
 
 ```typescript
-import { Hono } from "hono";
-import { Site, FEATURE } from "@zeroad.network/token";
+import { Hono } from "hono"
+import { Site, FEATURE } from "@zeroad.network/token"
 
-const app = new Hono();
+const app = new Hono()
 
 // Create site instance once
 const site = Site({
   clientId: process.env.ZERO_AD_CLIENT_ID!,
   features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
-});
+})
 
 app.use("*", async (c, next) => {
-  c.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
+  c.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE)
 
-  c.set("tokenContext", await site.parseClientToken(c.req.header(site.CLIENT_HEADER_NAME)));
+  c.set("tokenContext", await site.parseClientToken(c.req.header(site.CLIENT_HEADER_NAME)))
 
-  await next();
-});
+  await next()
+})
 
 app.get("/", (c) => {
   return c.html(
     renderTemplate({
       tokenContext: c.get("tokenContext"),
     })
-  );
-});
+  )
+})
 
-export default app;
+export default app
 ```
 
 ## Complete Usage Example
 
 ```typescript
-import express from "express";
-import { Site, FEATURE } from "@zeroad.network/token";
+import express from "express"
+import { Site, FEATURE } from "@zeroad.network/token"
 
-const app = express();
+const app = express()
 
 // Create your site instance once at startup
 const site = Site({
@@ -443,47 +443,47 @@ const site = Site({
     ttl: 10000,
     maxSize: 500,
   },
-});
+})
 
 // Global middleware
 app.use(async (req, res, next) => {
-  res.set(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
-  req.tokenContext = await site.parseClientToken(req.get(site.CLIENT_HEADER_NAME));
-  next();
-});
+  res.set(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE)
+  req.tokenContext = await site.parseClientToken(req.get(site.CLIENT_HEADER_NAME))
+  next()
+})
 
 // Homepage with ads
 app.get("/", async (req, res) => {
   res.render("index", {
     tokenContext: req.tokenContext,
-  });
-});
+  })
+})
 
 // Article page with paywall
 app.get("/article/:id", async (req, res) => {
-  const article = await db.articles.findById(req.params.id);
+  const article = await db.articles.findById(req.params.id)
 
   res.render("article", {
     article,
     tokenContext: req.tokenContext,
-  });
-});
+  })
+})
 
 // Premium API endpoint
 app.get("/api/premium-data", async (req, res) => {
   if (!req.tokenContext.ENABLE_SUBSCRIPTION_ACCESS) {
     return res.status(403).json({
       error: "Premium subscription required",
-    });
+    })
   }
 
-  const data = await getPremiumData();
-  res.json(data);
-});
+  const data = await getPremiumData()
+  res.json(data)
+})
 
 app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
-});
+  console.log("Server running on http://localhost:3000")
+})
 ```
 
 **Template Example:**
@@ -569,44 +569,44 @@ When implementing Zero Ad Network features, you **must** fulfill these requireme
 ### Tokens Not Working
 
 ```typescript
-import { Site, setLogLevel } from "@zeroad.network/token";
+import { Site, setLogLevel } from "@zeroad.network/token"
 
 // Enable debug logging
-setLogLevel("debug");
+setLogLevel("debug")
 
 const site = Site({
   clientId: process.env.ZERO_AD_CLIENT_ID!,
   features: [FEATURE.CLEAN_WEB],
-});
+})
 
 // In your route handler
 app.use(async (req, res, next) => {
   // Check if token header is being received
-  const headerValue = req.get(site.CLIENT_HEADER_NAME);
-  console.log("Header value:", headerValue);
+  const headerValue = req.get(site.CLIENT_HEADER_NAME)
+  console.log("Header value:", headerValue)
 
   // Parse and verify
-  const tokenContext = await site.parseClientToken(headerValue);
-  console.log("Token context:", tokenContext);
+  const tokenContext = await site.parseClientToken(headerValue)
+  console.log("Token context:", tokenContext)
 
-  req.tokenContext = tokenContext;
-  next();
-});
+  req.tokenContext = tokenContext
+  next()
+})
 ```
 
 ### Cache Issues
 
 ```typescript
-import { clearHeaderCache, getCacheConfig } from "@zeroad.network/token";
+import { clearHeaderCache, getCacheConfig } from "@zeroad.network/token"
 
 // Check current config
-console.log(getCacheConfig());
+console.log(getCacheConfig())
 
 // Clear cache if needed
-clearHeaderCache();
+clearHeaderCache()
 
 // Disable caching for debugging
-configureCaching({ enabled: false });
+configureCaching({ enabled: false })
 ```
 
 ### Common Issues
@@ -632,13 +632,13 @@ const site = Site({
     ttl: 5000,
     maxSize: 100,
   },
-});
+})
 
 // Returns an object with:
-site.parseClientToken(headerValue); // Parse and verify tokens
-site.CLIENT_HEADER_NAME; // "x-better-web-hello"
-site.SERVER_HEADER_NAME; // "X-Better-Web-Welcome"
-site.SERVER_HEADER_VALUE; // Your site's welcome header value
+site.parseClientToken(headerValue) // Parse and verify tokens
+site.CLIENT_HEADER_NAME // "x-better-web-hello"
+site.SERVER_HEADER_NAME // "X-Better-Web-Welcome"
+site.SERVER_HEADER_VALUE // Your site's welcome header value
 ```
 
 **Options:**
@@ -652,13 +652,13 @@ site.SERVER_HEADER_VALUE; // Your site's welcome header value
 Configure global cache settings (applies to all Site instances).
 
 ```typescript
-import { configureCaching } from "@zeroad.network/token";
+import { configureCaching } from "@zeroad.network/token"
 
 configureCaching({
   enabled: boolean, // Enable/disable caching
   ttl: number, // Time-to-live in milliseconds
   maxSize: number, // Maximum cache entries
-});
+})
 ```
 
 ### `clearHeaderCache()`
@@ -666,9 +666,9 @@ configureCaching({
 Manually clear the token cache.
 
 ```typescript
-import { clearHeaderCache } from "@zeroad.network/token";
+import { clearHeaderCache } from "@zeroad.network/token"
 
-clearHeaderCache();
+clearHeaderCache()
 ```
 
 ### `setLogLevel(level)`
@@ -676,9 +676,9 @@ clearHeaderCache();
 Set logging verbosity for debugging.
 
 ```typescript
-import { setLogLevel } from "@zeroad.network/token";
+import { setLogLevel } from "@zeroad.network/token"
 
-setLogLevel("debug"); // "error" | "warn" | "info" | "debug"
+setLogLevel("debug") // "error" | "warn" | "info" | "debug"
 ```
 
 ### `setLogTransport(fn)`
@@ -686,31 +686,31 @@ setLogLevel("debug"); // "error" | "warn" | "info" | "debug"
 Customize where logs are sent (useful for production monitoring).
 
 ```typescript
-import { setLogTransport } from "@zeroad.network/token";
+import { setLogTransport } from "@zeroad.network/token"
 
 // Send logs to your monitoring service
 setLogTransport((level, ...args) => {
   if (level === "error") {
-    yourMonitoringService.captureError(args);
+    yourMonitoringService.captureError(args)
   } else {
-    yourLogger.log(level, ...args);
+    yourLogger.log(level, ...args)
   }
-});
+})
 
 // Example: Integrate with Winston
-import winston from "winston";
+import winston from "winston"
 
 const logger = winston.createLogger({
   transports: [new winston.transports.File({ filename: "zeroad.log" })],
-});
+})
 
 setLogTransport((level, ...args) => {
-  logger.log(level, args.join(" "));
-});
+  logger.log(level, args.join(" "))
+})
 
 // Example: Disable all logging in production
 if (process.env.NODE_ENV === "production") {
-  setLogTransport(() => {}); // No-op function
+  setLogTransport(() => {}) // No-op function
 }
 ```
 

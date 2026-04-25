@@ -90,13 +90,13 @@ To test without purchasing a subscription:
 ### Type Definition
 
 ```typescript
-import { Site, FEATURE, type TokenContext } from "@zeroad.network/token";
+import { Site, FEATURE, type TokenContext } from "@zeroad.network/token"
 
 type Variables = {
-  tokenContext: TokenContext;
-};
+  tokenContext: TokenContext
+}
 
-const app = new Hono<{ Variables: Variables }>();
+const app = new Hono<{ Variables: Variables }>()
 ```
 
 ### Site Initialization
@@ -110,7 +110,7 @@ const site = Site({
     ttl: 10000,
     maxSize: 500,
   },
-});
+})
 ```
 
 ### Middleware
@@ -118,29 +118,29 @@ const site = Site({
 ```typescript
 app.use("*", async (c, next) => {
   // Set Welcome Header
-  c.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
+  c.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE)
 
   // Parse token (async)
-  const tokenContext = await site.parseClientToken(c.req.header(site.CLIENT_HEADER_NAME));
+  const tokenContext = await site.parseClientToken(c.req.header(site.CLIENT_HEADER_NAME))
 
-  c.set("tokenContext", tokenContext);
+  c.set("tokenContext", tokenContext)
 
-  await next();
-});
+  await next()
+})
 ```
 
 ### Route Handler
 
 ```typescript
 app.get("/", (c) => {
-  const tokenContext = c.get("tokenContext");
+  const tokenContext = c.get("tokenContext")
 
   const html = eta.render("homepage", {
     tokenContext,
-  });
+  })
 
-  return c.html(html as string);
-});
+  return c.html(html as string)
+})
 ```
 
 ## Token Context
@@ -149,12 +149,12 @@ The `tokenContext` object contains these boolean flags:
 
 ```typescript
 interface TokenContext {
-  HIDE_ADVERTISEMENTS: boolean;
-  HIDE_COOKIE_CONSENT_SCREEN: boolean;
-  HIDE_MARKETING_DIALOGS: boolean;
-  DISABLE_NON_FUNCTIONAL_TRACKING: boolean;
-  DISABLE_CONTENT_PAYWALL: boolean;
-  ENABLE_SUBSCRIPTION_ACCESS: boolean;
+  HIDE_ADVERTISEMENTS: boolean
+  HIDE_COOKIE_CONSENT_SCREEN: boolean
+  HIDE_MARKETING_DIALOGS: boolean
+  DISABLE_NON_FUNCTIONAL_TRACKING: boolean
+  DISABLE_CONTENT_PAYWALL: boolean
+  ENABLE_SUBSCRIPTION_ACCESS: boolean
 }
 ```
 

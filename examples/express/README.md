@@ -70,7 +70,7 @@ To test without purchasing a subscription:
 ### Site Initialization
 
 ```javascript
-import { Site, FEATURE } from "@zeroad.network/token";
+import { Site, FEATURE } from "@zeroad.network/token"
 
 const site = Site({
   clientId: "YOUR_CLIENT_ID",
@@ -80,7 +80,7 @@ const site = Site({
     ttl: 10000,
     maxSize: 500,
   },
-});
+})
 ```
 
 ### Middleware
@@ -88,13 +88,13 @@ const site = Site({
 ```javascript
 app.use(async (req, res, next) => {
   // Set Welcome Header
-  res.set(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
+  res.set(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE)
 
   // Parse token (async)
-  req.tokenContext = await site.parseClientToken(req.get(site.CLIENT_HEADER_NAME));
+  req.tokenContext = await site.parseClientToken(req.get(site.CLIENT_HEADER_NAME))
 
-  next();
-});
+  next()
+})
 ```
 
 ### Template Rendering
@@ -103,8 +103,8 @@ app.use(async (req, res, next) => {
 app.get("/", async (req, res) => {
   res.render("homepage", {
     tokenContext: req.tokenContext,
-  });
-});
+  })
+})
 ```
 
 ### Template Usage

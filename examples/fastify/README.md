@@ -89,7 +89,7 @@ To test without purchasing a subscription:
 ### Site Initialization
 
 ```typescript
-import { Site, FEATURE, type TokenContext } from "@zeroad.network/token";
+import { Site, FEATURE, type TokenContext } from "@zeroad.network/token"
 
 const site = Site({
   clientId: process.env.ZERO_AD_CLIENT_ID || "DEMO-Z2CclA8oXIT1e0Qmq",
@@ -99,7 +99,7 @@ const site = Site({
     ttl: 10000,
     maxSize: 500,
   },
-});
+})
 ```
 
 ### Type Extension
@@ -107,7 +107,7 @@ const site = Site({
 ```typescript
 declare module "fastify" {
   interface FastifyRequest {
-    tokenContext: TokenContext;
+    tokenContext: TokenContext
   }
 }
 ```
@@ -117,11 +117,11 @@ declare module "fastify" {
 ```typescript
 fastify.addHook("onRequest", async (request, reply) => {
   // Set Welcome Header
-  reply.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
+  reply.header(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE)
 
   // Parse token (async)
-  request.tokenContext = await site.parseClientToken(request.headers[site.CLIENT_HEADER_NAME]);
-});
+  request.tokenContext = await site.parseClientToken(request.headers[site.CLIENT_HEADER_NAME])
+})
 ```
 
 ### Route Handler
@@ -130,8 +130,8 @@ fastify.addHook("onRequest", async (request, reply) => {
 fastify.get("/", async (request, reply) => {
   return reply.view("homepage", {
     tokenContext: request.tokenContext,
-  });
-});
+  })
+})
 ```
 
 ## Token Context
@@ -140,12 +140,12 @@ The `tokenContext` object contains these boolean flags:
 
 ```typescript
 interface TokenContext {
-  HIDE_ADVERTISEMENTS: boolean;
-  HIDE_COOKIE_CONSENT_SCREEN: boolean;
-  HIDE_MARKETING_DIALOGS: boolean;
-  DISABLE_NON_FUNCTIONAL_TRACKING: boolean;
-  DISABLE_CONTENT_PAYWALL: boolean;
-  ENABLE_SUBSCRIPTION_ACCESS: boolean;
+  HIDE_ADVERTISEMENTS: boolean
+  HIDE_COOKIE_CONSENT_SCREEN: boolean
+  HIDE_MARKETING_DIALOGS: boolean
+  DISABLE_NON_FUNCTIONAL_TRACKING: boolean
+  DISABLE_CONTENT_PAYWALL: boolean
+  ENABLE_SUBSCRIPTION_ACCESS: boolean
 }
 ```
 

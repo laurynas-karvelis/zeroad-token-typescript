@@ -1,16 +1,16 @@
 /* eslint-disable no-console */
-import path from "node:path";
-import express from "express";
-import { Eta } from "eta";
-import { Site, FEATURE } from "@zeroad.network/token";
+import path from "node:path"
+import express from "express"
+import { Eta } from "eta"
+import { Site, FEATURE } from "@zeroad.network/token"
 
-const app = express();
+const app = express()
 
-const eta = new Eta();
+const eta = new Eta()
 
-app.engine("eta", buildEtaEngine());
-app.set("view engine", "eta");
-app.set("views", path.join(import.meta.dirname, "../templates"));
+app.engine("eta", buildEtaEngine())
+app.set("view engine", "eta")
+app.set("views", path.join(import.meta.dirname, "../templates"))
 
 const site = Site({
   clientId: process.env.ZERO_AD_CLIENT_ID || "DEMO-Z2CclA8oXIT1e0Qmq",
@@ -20,48 +20,48 @@ const site = Site({
     ttl: 10000,
     maxSize: 500,
   },
-});
+})
 
 app.use(async (req, res, next) => {
-  res.set(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE);
-  req.tokenContext = await site.parseClientToken(req.get(site.CLIENT_HEADER_NAME));
-  next();
-});
+  res.set(site.SERVER_HEADER_NAME, site.SERVER_HEADER_VALUE)
+  req.tokenContext = await site.parseClientToken(req.get(site.CLIENT_HEADER_NAME))
+  next()
+})
 
 app.get("/", async (req, res) => {
   res.render("homepage", {
     tokenContext: req.tokenContext,
-  });
-});
+  })
+})
 
 app.get("/api/premium-data", async (req, res) => {
   if (!req.tokenContext.ENABLE_SUBSCRIPTION_ACCESS) {
     res.status(403).json({
       error: "Premium subscription required",
       message: "Subscribe to Zero Ad Network to access this endpoint",
-    });
-    return;
+    })
+    return
   }
 
   res.json({
     data: "This is premium content only available to Zero Ad Network subscribers",
     timestamp: new Date().toISOString(),
-  });
-});
+  })
+})
 
 function buildEtaEngine() {
   return (path, opts, callback) => {
     try {
-      const fileContent = eta.readFile(path);
-      const renderedTemplate = eta.renderString(fileContent, opts);
-      callback(null, renderedTemplate);
+      const fileContent = eta.readFile(path)
+      const renderedTemplate = eta.renderString(fileContent, opts)
+      callback(null, renderedTemplate)
     } catch (error) {
-      callback(error);
+      callback(error)
     }
-  };
+  }
 }
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8080
 
 app.listen(PORT, () => {
   console.log(`
@@ -79,5 +79,5 @@ Cache Config:
   • Enabled: true
   • TTL: 10000ms
   • Max Size: 500 entries
-  `);
-});
+  `)
+})

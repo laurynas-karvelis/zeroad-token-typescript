@@ -3,7 +3,7 @@
  * Used to verify that `X-Better-Web-Hello` header values are authentic
  * and have not been tampered with.
  */
-export const ZEROAD_NETWORK_PUBLIC_KEY: string = "MCowBQYDK2VwAyEAignXRaTQtxEDl4ThULucKNQKEEO2Lo5bEO8qKwjSDVs=";
+export const ZEROAD_NETWORK_PUBLIC_KEY: string = "MCowBQYDK2VwAyEAignXRaTQtxEDl4ThULucKNQKEEO2Lo5bEO8qKwjSDVs="
 
 /**
  * IMPORTANT: Requirements listed for each feature class MUST be fulfilled fully.
@@ -40,4 +40,4 @@ export enum PROTOCOL_VERSION {
   V_1 = 1,
 }
 
-export const CURRENT_PROTOCOL_VERSION = PROTOCOL_VERSION.V_1;
+export const CURRENT_PROTOCOL_VERSION = PROTOCOL_VERSION.V_1
