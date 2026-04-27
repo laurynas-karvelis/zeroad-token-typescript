@@ -1,7 +1,7 @@
+import { beforeEach, describe, expect, test } from "bun:test"
 import { randomUUID } from "crypto"
-import { describe, test, expect, beforeEach } from "bun:test"
-import { decodeServerHeader, encodeServerHeader } from "../headers/server"
 import { FEATURE } from "../constants"
+import { decodeServerHeader, encodeServerHeader } from "../headers/server"
 
 describe("Server Header", () => {
   let clientId: string

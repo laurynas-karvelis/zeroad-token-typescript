@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import path from "node:path"
-import Fastify from "fastify"
 import fastifyView from "@fastify/view"
+import { FEATURE, Site, type TokenContext } from "@zeroad.network/token"
 import { Eta } from "eta"
-import { Site, FEATURE, type TokenContext } from "@zeroad.network/token"
+import Fastify from "fastify"
 
 const fastify = Fastify({
   logger: true,

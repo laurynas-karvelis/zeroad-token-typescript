@@ -1,8 +1,8 @@
-import { PROTOCOL_VERSION, FEATURE, ZEROAD_NETWORK_PUBLIC_KEY } from "../../constants"
-import { cacheConfig, cleanExpiredEntries, headerCache, trimCache } from "./cache"
-import { fromBase64, setFlags, toBase64 } from "../../helpers"
+import { FEATURE, PROTOCOL_VERSION, ZEROAD_NETWORK_PUBLIC_KEY } from "../../constants"
 import { nonce, sign, verify } from "../../crypto"
+import { fromBase64, setFlags, toBase64 } from "../../helpers"
 import { log } from "../../logger"
+import { cacheConfig, cleanExpiredEntries, headerCache, trimCache } from "./cache"
 
 const VERSION_BYTES = 1
 const NONCE_BYTES = 4
@@ -72,7 +72,8 @@ export async function parseClientToken(
     if (cached && cached.effectiveExpiry > now) {
       cached.accessCount++
       return buildContext(cached.data, options, now)
-    } else if (cached) {
+    }
+    if (cached) {
       headerCache.delete(headerValueAsString)
     }
   }
@@ -208,7 +209,9 @@ export async function decodeClientHeader(
 
     throw new Error(`Unsupported protocol version: ${version}`)
   } catch (err) {
-    log("warn", "Could not decode client header value", { reason: (err as Error)?.message })
+    log("warn", "Could not decode client header value", {
+      reason: (err as Error)?.message,
+    })
     return undefined
   }
 }

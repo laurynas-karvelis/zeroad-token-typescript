@@ -2,11 +2,11 @@ import { Buffer } from "node:buffer"
 import {
   createPrivateKey,
   createPublicKey,
+  generateKeyPairSync,
+  type KeyObject,
   sign as nodeSign,
   verify as nodeVerify,
   randomBytes,
-  generateKeyPairSync,
-  KeyObject,
 } from "node:crypto"
 
 const keyCache = new Map<string, KeyObject>()

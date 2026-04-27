@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import path from "node:path"
-import { Hono } from "hono"
+import { FEATURE, Site, type TokenContext } from "@zeroad.network/token"
 import { Eta } from "eta"
-import { Site, FEATURE, type TokenContext } from "@zeroad.network/token"
+import { Hono } from "hono"
 
 // Extend Hono context type
 type Variables = {

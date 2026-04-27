@@ -1,6 +1,6 @@
 import assert from "node:assert"
 import { randomUUID } from "node:crypto"
-import { Site, FEATURE, SERVER_HEADER, CLIENT_HEADER } from "../dist/index.mjs"
+import { CLIENT_HEADER, FEATURE, SERVER_HEADER, Site } from "../dist/index.mjs"
 
 ;(async () => {
   const clientId = randomUUID()

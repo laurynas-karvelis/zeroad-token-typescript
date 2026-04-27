@@ -1,8 +1,8 @@
+import { beforeEach, describe, expect, test } from "bun:test"
 import { randomUUID } from "crypto"
-import { describe, test, expect, beforeEach } from "bun:test"
-import { decodeClientHeader, encodeClientHeader, parseClientToken } from "../headers/client"
 import { CURRENT_PROTOCOL_VERSION, FEATURE, ZEROAD_NETWORK_PUBLIC_KEY } from "../constants"
 import { generateKeys } from "../crypto"
+import { decodeClientHeader, encodeClientHeader, parseClientToken } from "../headers/client"
 
 describe("Client Headers", () => {
   let privateKey: string
@@ -97,7 +97,11 @@ describe("Client Headers", () => {
         privateKey
       )
 
-      const tokenContext = await parseClientToken(headerValue, { clientId, publicKey, features })
+      const tokenContext = await parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features,
+      })
       expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: true,
         HIDE_COOKIE_CONSENT_SCREEN: true,
@@ -116,7 +120,11 @@ describe("Client Headers", () => {
         privateKey
       )
 
-      const tokenContext = await parseClientToken(headerValue, { clientId, publicKey, features })
+      const tokenContext = await parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features,
+      })
       expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,
@@ -153,7 +161,11 @@ describe("Client Headers", () => {
     test("should construct correct output when token has CLEAN_WEB and site has ONE_PASS feature", async () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000)
       const headerValue = await encodeClientHeader(
-        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURE.CLEAN_WEB] },
+        {
+          version: CURRENT_PROTOCOL_VERSION,
+          expiresAt,
+          features: [FEATURE.CLEAN_WEB],
+        },
         privateKey
       )
 
@@ -176,7 +188,11 @@ describe("Client Headers", () => {
     test("should construct correct output when token has ONE_PASS and site has CLEAN_WEB feature", async () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000)
       const headerValue = await encodeClientHeader(
-        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURE.ONE_PASS] },
+        {
+          version: CURRENT_PROTOCOL_VERSION,
+          expiresAt,
+          features: [FEATURE.ONE_PASS],
+        },
         privateKey
       )
 
@@ -199,7 +215,11 @@ describe("Client Headers", () => {
     test("should construct correct output when token has both CLEAN_WEB and ONE_PASS but site has CLEAN_WEB feature only", async () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000)
       const headerValue = await encodeClientHeader(
-        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS] },
+        {
+          version: CURRENT_PROTOCOL_VERSION,
+          expiresAt,
+          features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
+        },
         privateKey
       )
 
@@ -222,7 +242,11 @@ describe("Client Headers", () => {
     test("should construct correct output when token has both CLEAN_WEB and ONE_PASS but site has ONE_PASS feature only", async () => {
       const expiresAt = new Date(Date.now() + 24 * 3600 * 1000)
       const headerValue = await encodeClientHeader(
-        { version: CURRENT_PROTOCOL_VERSION, expiresAt, features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS] },
+        {
+          version: CURRENT_PROTOCOL_VERSION,
+          expiresAt,
+          features: [FEATURE.CLEAN_WEB, FEATURE.ONE_PASS],
+        },
         privateKey
       )
 
@@ -273,7 +297,11 @@ describe("Client Headers", () => {
         privateKey
       )
 
-      const tokenContext = await parseClientToken(headerValue, { clientId, publicKey, features })
+      const tokenContext = await parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features,
+      })
       expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: true,
         HIDE_COOKIE_CONSENT_SCREEN: true,
@@ -295,7 +323,11 @@ describe("Client Headers", () => {
       const differentClientId = randomUUID()
       expect(clientId).not.toEqual(differentClientId)
 
-      const tokenContext = await parseClientToken(headerValue, { clientId: differentClientId, publicKey, features })
+      const tokenContext = await parseClientToken(headerValue, {
+        clientId: differentClientId,
+        publicKey,
+        features,
+      })
       expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,
@@ -314,7 +346,11 @@ describe("Client Headers", () => {
         privateKey
       )
 
-      const tokenContext = await parseClientToken(headerValue, { clientId, publicKey, features })
+      const tokenContext = await parseClientToken(headerValue, {
+        clientId,
+        publicKey,
+        features,
+      })
       expect(tokenContext).toEqual({
         HIDE_ADVERTISEMENTS: false,
         HIDE_COOKIE_CONSENT_SCREEN: false,

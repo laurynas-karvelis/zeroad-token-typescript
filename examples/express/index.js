@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import path from "node:path"
-import express from "express"
+import { FEATURE, Site } from "@zeroad.network/token"
 import { Eta } from "eta"
-import { Site, FEATURE } from "@zeroad.network/token"
+import express from "express"
 
 const app = express()
 

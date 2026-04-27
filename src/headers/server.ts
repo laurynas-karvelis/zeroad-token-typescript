@@ -1,4 +1,4 @@
-import { CURRENT_PROTOCOL_VERSION, PROTOCOL_VERSION, FEATURE } from "../constants"
+import { CURRENT_PROTOCOL_VERSION, FEATURE, PROTOCOL_VERSION } from "../constants"
 import { assert, FEATURE_MAP, hasFlag, setFlags } from "../helpers"
 import { log } from "../logger"
 
@@ -52,6 +52,8 @@ export function decodeServerHeader(headerValue: string | null | undefined): Welc
       features,
     }
   } catch (err) {
-    log("warn", "Could not decode server header value", { reason: (err as Error)?.message })
+    log("warn", "Could not decode server header value", {
+      reason: (err as Error)?.message,
+    })
   }
 }

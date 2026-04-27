@@ -1,5 +1,5 @@
-import { DecodedClientHeader } from "."
 import { log } from "../../logger"
+import type { DecodedClientHeader } from "."
 
 export interface CacheConfig {
   enabled: boolean
