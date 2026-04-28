@@ -4,8 +4,8 @@ import { log } from "../logger"
 
 const SEPARATOR = "^"
 
-const validFeatureValues = Object.values(FEATURE).filter((key) => !isNaN(Number(key))) as FEATURE[]
-const validFeatureKeys = Object.values(FEATURE).filter((key) => isNaN(Number(key))) as FEATURE[]
+const validFeatureValues = Object.values(FEATURE).filter((key) => !Number.isNaN(Number(key))) as FEATURE[]
+const validFeatureKeys = Object.values(FEATURE).filter((key) => Number.isNaN(Number(key))) as FEATURE[]
 
 export function encodeServerHeader(clientId: string, features: FEATURE[]) {
   if (!clientId?.length) {

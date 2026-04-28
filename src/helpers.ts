@@ -1,7 +1,7 @@
 import { FEATURE } from "./constants"
 
 export const FEATURE_MAP = new Map<keyof typeof FEATURE, number>(
-  Object.entries(FEATURE).filter(([k]) => isNaN(Number(k))) as [keyof typeof FEATURE, number][]
+  Object.entries(FEATURE).filter(([k]) => Number.isNaN(Number(k))) as [keyof typeof FEATURE, number][]
 )
 
 export function toBase64(data: Uint8Array) {
