@@ -79,7 +79,7 @@ function resolveCacheOptions(cache: PublisherOptions["cache"]): Partial<CacheOpt
  * const visitor = await publisher.verify(request.headers[publisher.tokenHeaderNameLowercase])
  *
  * if (visitor.subscriber) {
- *   // no ads, no trackers, no consent dialog, no paywall
+ *   // Remove ads and interruptions; grant your included content access.
  * }
  * ```
  */

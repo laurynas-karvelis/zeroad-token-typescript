@@ -43,7 +43,7 @@ response.setHeader(...publisher.header)
 const visitor = await publisher.verify(request.headers["better-web-token"], request.headers.host)
 
 if (visitor.subscriber) {
-  // suppress ads, trackers, consent dialogs, marketing modals; unlock paywalled content
+  // suppress ads, trackers, consent dialogs, marketing modals; grant the publisher’s base subscription or custom included access level
 }
 ```
 
