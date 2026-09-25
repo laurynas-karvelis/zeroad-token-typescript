@@ -55,7 +55,5 @@ function selectDecoder(): Decoder {
   throw new Error("No base64 decoder available in this runtime")
 }
 
-const decoder = selectDecoder()
-
 /** Decodes base64url to bytes, returning `undefined` rather than throwing on malformed input. */
-export const fromBase64Url: Decoder = decoder
+export const fromBase64Url: Decoder = selectDecoder()

@@ -182,6 +182,39 @@ describe("result cache internals", () => {
   const good = { subscriber: true, plan: 1, expiresAt: 4_000_000_000 } as const
   const bad = { subscriber: false, reason: REJECTED.FORGED } as const
 
+  test("undefined enabled keeps caching enabled by default", () => {
+    const cache = createResultCache({ enabled: undefined })
+
+    cache.set("key", good, 0)
+
+    expect(cache.get("key", 1)).toEqual(good)
+  })
+
+  test("undefined maxSize retains the default capacity", () => {
+    const cache = createResultCache({ maxSize: undefined })
+
+    for (let index = 0; index <= DEFAULT_CACHE_OPTIONS.maxSize; index++) {
+      cache.set(String(index), good, index)
+    }
+
+    expect(cache.stats()).toMatchObject({
+      size: DEFAULT_CACHE_OPTIONS.maxSize,
+      maxSize: DEFAULT_CACHE_OPTIONS.maxSize,
+      evictions: 1,
+    })
+  })
+
+  test("undefined ttl retains default expiry and the token expiry bound", () => {
+    const cache = createResultCache({ ttl: undefined })
+
+    cache.set("failure", bad, 0)
+    cache.set("success", { subscriber: true, plan: 1, expiresAt: 1 }, 0)
+
+    expect(cache.get("failure", DEFAULT_CACHE_OPTIONS.ttl - 1)).toEqual(bad)
+    expect(cache.get("failure", DEFAULT_CACHE_OPTIONS.ttl)).toBeUndefined()
+    expect(cache.get("success", 1000)).toBeUndefined()
+  })
+
   test("never trusts a verdict past the token's own expiry, however long the TTL", () => {
     const cache = createResultCache({ ttl: 10_000_000 })
     const expiresAt = 1_000_000

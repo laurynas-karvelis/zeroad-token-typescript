@@ -47,24 +47,24 @@ function decodeStandardBase64(base64: string): Uint8Array {
 
 /** Strips the SPKI DER wrapper off a base64 public key, leaving the raw 32 bytes. */
 export function rawPublicKeyFromSpkiBase64(base64: string): Uint8Array {
-  const invalid = new Error("Expected a base64-encoded SPKI DER Ed25519 public key")
   const bytes = decodeStandardBase64(base64)
 
-  if (bytes.length !== SPKI_PREFIX.length + RAW_PUBLIC_KEY_BYTES) throw invalid
-
-  for (let index = 0; index < SPKI_PREFIX.length; index++) {
-    if (bytes[index] !== SPKI_PREFIX[index]) throw invalid
+  if (
+    bytes.length !== SPKI_PREFIX.length + RAW_PUBLIC_KEY_BYTES ||
+    !SPKI_PREFIX.every((byte, index) => bytes[index] === byte)
+  ) {
+    throw new Error("Expected a base64-encoded SPKI DER Ed25519 public key")
   }
 
   return bytes.subarray(SPKI_PREFIX.length)
 }
 
 async function selectVerifier(): Promise<Verifier> {
-  return (await nodeCryptoVerifier()) ?? webCryptoVerifier() ?? missing()
-}
+  const selected = (await nodeCryptoVerifier()) ?? webCryptoVerifier()
 
-function missing(): never {
-  throw new Error("No Ed25519 implementation available in this runtime")
+  if (!selected) throw new Error("No Ed25519 implementation available in this runtime")
+
+  return selected
 }
 
 /**
@@ -147,5 +147,5 @@ export async function verifyEd25519(
  */
 export function useVerifier(override?: Verifier): void {
   verifier = override
-  pending = override ? Promise.resolve(override) : undefined
+  pending = undefined
 }

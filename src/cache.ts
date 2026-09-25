@@ -80,7 +80,11 @@ function isLessValuable(candidate: Entry, incumbent: Entry): boolean {
 export function createResultCache(overrides: Partial<CacheOptions> = {}): ResultCache {
   validate(overrides)
 
-  const options: CacheOptions = { ...DEFAULT_CACHE_OPTIONS, ...overrides }
+  const {
+    enabled = DEFAULT_CACHE_OPTIONS.enabled,
+    maxSize = DEFAULT_CACHE_OPTIONS.maxSize,
+    ttl = DEFAULT_CACHE_OPTIONS.ttl,
+  } = overrides
   const entries = new Map<string, Entry>()
 
   let hits = 0
@@ -113,17 +117,11 @@ export function createResultCache(overrides: Partial<CacheOptions> = {}): Result
 
   return {
     get(key, now) {
-      if (!options.enabled) return undefined
+      if (!enabled) return undefined
 
       const entry = entries.get(key)
 
-      if (!entry) {
-        misses++
-
-        return undefined
-      }
-
-      if (entry.goodUntil <= now) {
+      if (!entry || entry.goodUntil <= now) {
         entries.delete(key)
         misses++
 
@@ -137,10 +135,10 @@ export function createResultCache(overrides: Partial<CacheOptions> = {}): Result
     },
 
     set(key, verdict, now) {
-      if (!options.enabled) return
+      if (!enabled) return
 
       // A success is never trusted past the token's own expiry, however generous the TTL is
-      const ttlExpiry = now + options.ttl
+      const ttlExpiry = now + ttl
       const goodUntil = verdict.subscriber ? Math.min(ttlExpiry, verdict.expiresAt * 1000) : ttlExpiry
 
       if (goodUntil <= now) return
@@ -154,7 +152,7 @@ export function createResultCache(overrides: Partial<CacheOptions> = {}): Result
         sweep(now)
       }
 
-      while (entries.size > options.maxSize) evictOne()
+      while (entries.size > maxSize) evictOne()
     },
 
     clear() {
@@ -164,7 +162,7 @@ export function createResultCache(overrides: Partial<CacheOptions> = {}): Result
     stats() {
       return {
         size: entries.size,
-        maxSize: options.maxSize,
+        maxSize,
         hits,
         misses,
         evictions,
