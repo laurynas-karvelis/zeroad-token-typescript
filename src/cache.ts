@@ -36,7 +36,8 @@ export const DEFAULT_CACHE_OPTIONS: Readonly<CacheOptions> = Object.freeze({
 
 /** The part of a verdict worth remembering. Rebuilt into a public result on every hit. */
 export type CachedVerdict =
-  { subscriber: true; plan: Plan; expiresAt: number } | { subscriber: false; reason: Rejected }
+  | { subscriber: true; plan: Plan; expiresAt: number }
+  | { subscriber: false; reason: Rejected }
 
 type Entry = {
   verdict: CachedVerdict

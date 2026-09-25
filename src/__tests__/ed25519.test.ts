@@ -1,5 +1,5 @@
-import { generateKeyPairSync, sign } from "node:crypto"
 import { describe, expect, test } from "bun:test"
+import { generateKeyPairSync, sign } from "node:crypto"
 import { fromBase64Url } from "../base64"
 import { AUTHORITY_PUBLIC_KEY } from "../constants"
 import { RAW_PUBLIC_KEY_BYTES, rawPublicKeyFromSpkiBase64, useVerifier, verifyEd25519 } from "../ed25519"

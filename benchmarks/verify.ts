@@ -20,7 +20,7 @@ const malformedToken = "!".repeat(TOKEN_CHARACTERS)
 async function measure(
   work: () => Promise<unknown>,
   iterations: number,
-  warmup = 2000,
+  warmup = 2000
 ): Promise<{ perCallUs: number; opsPerSec: number }> {
   for (let i = 0; i < warmup; i++) await work()
 
