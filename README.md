@@ -12,11 +12,16 @@ npm install @zeroad.network/token
 ## The thirty second version
 
 Zero Ad Network subscribers pay a monthly fee and install a browser extension. When one of them visits
-your site, the extension attaches a cryptographically signed token. You verify it locally, and if it
-checks out, serve a clean page without ads, non-essential third-party trackers, cookie consent screens,
+a recognized website, the extension attaches a cryptographically signed token to eligible requests.
+You verify it locally, and if it checks out, serve a clean page without ads, non-essential third-party trackers, cookie consent screens,
 or marketing popups, including newsletter signup prompts. If you sell access, grant your base subscription
 or a custom level that unlocks paid content or functionality. Higher tiers may remain restricted.
-Your share of their subscription is paid out monthly based on the time they actually spent with you.
+
+Earnings are calculated monthly from funded subscriber attention and allocation preferences. Publishers share
+70% of received revenue after processing fees and excluding tax; the platform retains 30%. Transfers to
+Stripe Express require a $30 accumulated balance and completed, eligible payout setup. Smaller balances
+carry forward. A Stripe transfer is separate from a bank withdrawal.
+See [how earnings work](https://zeroad.network/docs/monetization).
 
 The SDK verifies membership; your application decides which content belongs to that included access level.
 A subscriber token does not grant site administration, prove a purchase, or replace private-content permissions.
@@ -27,7 +32,7 @@ Two headers, and this package handles both ends:
 | Direction      | Header                 | Carries                                         |
 | :------------- | :--------------------- | :---------------------------------------------- |
 | You -> visitor | `Better-Web-Publisher` | your publisher ID, so the visit can be credited |
-| Visitor -> you | `Better-Web-Token`     | their signed, origin-bound subscription token   |
+| Visitor -> you | `Better-Web-Token`     | their signed, hostname-bound membership token   |
 
 ---
 
@@ -35,9 +40,14 @@ Two headers, and this package handles both ends:
 
 ### 1. Register
 
-[Sign up](https://zeroad.network/login), add your site, and copy your **publisher ID**.
+[Sign up](https://zeroad.network/login) and copy your account’s **Publisher ID**.
 
-### 2. Create a publisher, once, at startup
+You do not need a paid subscription or separate registration for each site. Announce the same ID on
+all your properties. Accepted subscriber activity creates an observed integration after upload and
+processing. You can also add and verify a website from your dashboard, then use **Test in your browser**.
+Test access earns nothing.
+
+### 2. Create a publisher
 
 ```ts
 import { createPublisher } from "@zeroad.network/token"
@@ -72,7 +82,8 @@ if (response.locals.visitor.subscriber) {
 }
 ```
 
-That is the whole integration. Copy-paste Hono and Express middleware, and the rest of the publisher
+Apply that decision in your rendering and access rules, and configure page caches as described below.
+Copy-paste Hono and Express middleware, and the rest of the publisher
 guide, live at [zeroad.network/docs/site-integration/remove-ads/node](https://zeroad.network/docs/site-integration/remove-ads/node).
 
 > Set `Better-Web-Publisher` even on pages where you never read a token. It is how the extension
@@ -109,8 +120,9 @@ Returns an object you keep for the life of the process:
 Takes the raw header value - `string`, `string[]` (Node hands back an array for a repeated header),
 `null` or `undefined`. Never throws on bad input; a junk token is a result, not an exception.
 
-The hostname may be omitted when exactly one was configured. Pass `request.headers.host` when you
-serve several - a host outside your whitelist is rejected, never trusted.
+Pass the actual request hostname, including when serving both an apex and `www`. Omitting it uses
+the single configured hostname; with multiple configured entries, omission throws a configuration
+error. A hostname outside the allowlist is rejected.
 
 The result is a discriminated union, so TypeScript gives you the right fields in each branch:
 
@@ -131,22 +143,21 @@ visitor.cached // whether this skipped the cryptography
 
 ### `REJECTED`
 
-Worth logging. Most of these are ordinary; two are not.
+Rejection reasons describe the failed check, not proof of an attack.
 
-| Reason                | Means                                            | Ordinary?                        |
-| :-------------------- | :----------------------------------------------- | :------------------------------- |
-| `missing`             | No token header. Most of your traffic.           | yes                              |
-| `malformed`           | Not a well-formed token.                         | yes                              |
-| `unsupported_version` | A newer token format. Upgrade this package.      | yes, but see below               |
-| `expired`             | Genuine, but past its expiry.                    | yes                              |
-| `unknown_hostname`    | The host asked for is not in your whitelist.     | check your config                |
-| `wrong_hostname`      | A genuine token minted for **a different site**. | **somebody is replaying tokens** |
-| `forged`              | Not signed by Zero Ad Network.                   | **somebody is minting tokens**   |
+| Reason                | Means                                                  | Ordinary?                        |
+| :-------------------- | :----------------------------------------------------- | :------------------------------- |
+| `missing`             | No token header. Most of your traffic.                 | yes                              |
+| `malformed`           | Not a well-formed token.                               | yes                              |
+| `unsupported_version` | Unsupported format; check for an SDK update.           | yes, but see below               |
+| `expired`             | Expiry field is past the allowed time.                 | yes                              |
+| `unknown_hostname`    | The host asked for is not in your whitelist.           | check your config                |
+| `wrong_hostname`      | Authority signature passed; hostname signature failed. | check hostname, proxy, or token  |
+| `forged`              | Authority signature failed.                            | check authority key or token     |
 
 The first time a token arrives whose version is newer than this package understands, it is rejected as
-`unsupported_version` **and** a one-off `console.warn` tells you an upgrade is due - the network has
-moved to a token format this build predates, and until you upgrade you will turn those subscribers
-away. If you would rather not see it - during a staged rollout, or in tests that feed such tokens on
+`unsupported_version` **and** a one-off `console.warn` suggests checking for an SDK update. The warning alone does not prove
+that the token is genuine or that a protocol upgrade has shipped. If you would rather not see it - during a staged rollout, or in tests that feed such tokens on
 purpose - call `suppressProtocolWarnings()` once at startup.
 
 ### Also exported
@@ -157,16 +168,28 @@ purpose - call `suppressProtocolWarnings()` once at startup.
 `suppressProtocolWarnings()`, and the `VerificationResult`, `SubscriberResult`, `NonSubscriberResult`,
 `Plan`, `Rejected`, `CacheOptions`, `CacheStats`, `Publisher`, `PublisherOptions` types.
 
-This package **only verifies**. Nothing here can mint a token - that requires a private key that never
-leaves the platform.
+This package **only verifies**. The platform’s private authority key signs credentials; the extension’s
+private ephemeral keys bind those credentials to hostnames. Neither key is included in a visitor token.
 
 ---
 
+## Discovery and page caching
+
+The first request to an unfamiliar site may have no token: the extension discovers your ID from the
+response or loaded page. Reload after recognition. Production injection covers HTTPS main-frame and
+media requests for the exact recognized hostname, not arbitrary fetch/XHR or subdomains.
+
+Forward `Better-Web-Token` and preserve the public request hostname through proxies. Configure every
+CDN, proxy, and page cache to bypass both lookup and storage for token-bearing requests, and return
+private, non-cacheable subscriber responses. Header presence alone must never grant access. Test the
+same URL with and without a valid token while caches are warm. The SDK’s result cache below caches
+verification decisions, not HTML.
+
 ## Caching
 
-A subscriber's token stays the same all day, so a returning visitor sends bytes you have already
-checked. Verifying once and remembering the answer turns 80 microseconds of elliptic curve maths into
-a 0.16 microsecond map lookup. It is on by default and there is rarely a reason to touch it.
+The extension reuses a token for its bound hostname while that credential remains valid, so a returning
+visitor may send bytes you have already checked. Caching avoids repeating the signature checks; see
+the benchmark results below. It is on by default and there is rarely a reason to touch it.
 
 ```ts
 createPublisher({
@@ -218,17 +241,18 @@ A token is 174 bytes, 232 base64url characters, and carries **two** Ed25519 sign
      110    64  hostnameSignature
 ```
 
-**The platform signs a batch credential.** Once a day, the extension generates a batch of throwaway
-keypairs locally and sends the public halves to us. We check the subscription is live, sign each one
-together with the plan and an expiry truncated to midnight UTC, and send them back. We never see the
-private halves, and the shared midnight expiry puts every subscriber in one anonymity set.
+**The platform signs batch credentials.** The extension checks its pool hourly and refreshes when
+credentials run low or approach expiry. It generates disposable keypairs locally and sends only the
+public halves to the platform. The platform checks account entitlement and signs the plan, expiry, and
+each key. Standard credentials expire at midnight UTC two days after issuance, about 24–48 hours later.
+Demo and publisher-test access use separately issued, hostname-restricted tokens.
 
 **The extension binds one to your hostname.** Offline, with no network call, the first time it meets
 `example.com` it takes an unused keypair and signs your hostname with the private half. It reuses that
-bound token for every request to you until it expires.
+bound token for eligible requests to that exact hostname while it remains valid.
 
-**You verify both signatures.** The first proves the platform issued the credential for a live
-subscription. The second proves it was minted for _your_ host.
+**You verify both signatures.** The first proves the platform authorized the credential’s plan and expiry.
+The second proves it was bound to _your_ hostname.
 
 The hostname is deliberately absent from the wire. Your server already knows what it serves and
 rebuilds the signed message from that, so there is nothing to parse or compare - a token bound
@@ -242,12 +266,13 @@ that mints bindings never leaves the visitor's browser.
 - You cannot present a visitor's token at another site. You would need a signature over that site's
   hostname, and you do not have the key.
 - Nobody can edit the plan or push out the expiry. Both are covered by the platform signature.
-- Nobody can mint a token. That needs a private key we hold.
+- Nobody can create a valid authority credential without the platform’s private key.
 
-Two properties to be aware of rather than surprised by. A token is reused for a day, so it is a stable
-identifier _for your site alone_ for that long - inherent to any multi-use token, and no other site
-ever sees the same one. And unlinkability from the platform itself rests on us not retaining which
-account we signed which key for, which is a policy commitment, not a mathematical one.
+Tokens contain no account ID, name, or email. Reuse permits same-host correlation and replay during
+validity. Issuance is authenticated, so the platform sees which account requests each public key; this
+is not blind issuance or mathematical anonymity. The extension separately uploads account-linked
+attention data, including creator page URLs. Offline verification cannot immediately revoke an issued
+token after cancellation or account closure.
 
 ### Why hostnames are a whitelist
 
@@ -298,9 +323,10 @@ works by checking `Better-Web-Publisher` appears on your responses (`curl -sI ht
 listed host counts as listed). Log `visitor.hostname` to see what actually arrived; a reverse proxy
 may be passing something you did not expect.
 
-**`wrong_hostname` from real visitors.** Should be rare - `www` and apex are folded together, so this
-is not the usual `www`-versus-apex slip. A steady stream means tokens are being replayed from another
-site; a trickle is usually a proxy rewriting `Host` to something the token was not bound to.
+**`wrong_hostname` from real visitors.** Apex and `www` share allowlist coverage, but their signatures
+are distinct. Pass the actual public request hostname and check proxy rewrites. A token for
+`example.com` cannot verify against `www.example.com`. An invalid hostname signature can also reflect
+a modified or replayed token.
 
 **`forged` for everybody.** A `publicKey` override left over from staging.
 
