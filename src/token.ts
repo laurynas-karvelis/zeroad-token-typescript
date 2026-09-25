@@ -74,14 +74,17 @@ export function readToken(token: string): TokenBytes | LayoutFailure {
   if (token.length !== TOKEN_CHARACTERS) return "malformed"
 
   const bytes = fromBase64Url(token)
+
   if (!bytes || bytes.length !== TOKEN_BYTES) return "malformed"
 
   if (bytes[VERSION_OFFSET] !== PROTOCOL_VERSION) {
     warnIfProtocolAhead(bytes[VERSION_OFFSET])
+
     return "unsupported_version"
   }
 
   const plan = bytes[PLAN_OFFSET]
+
   if (!KNOWN_PLANS.has(plan)) return "malformed"
 
   // Little-endian, spelled out rather than read through a DataView, because a DataView allocation per
@@ -101,6 +104,7 @@ export function credentialMessage(bytes: Uint8Array): Uint8Array {
   const message = new Uint8Array(CREDENTIAL_DOMAIN_BYTES.length + AUTHORITY_SIGNATURE_OFFSET)
   message.set(CREDENTIAL_DOMAIN_BYTES, 0)
   message.set(bytes.subarray(0, AUTHORITY_SIGNATURE_OFFSET), CREDENTIAL_DOMAIN_BYTES.length)
+
   return message
 }
 

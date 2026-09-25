@@ -57,12 +57,14 @@ describe("the runtime fallback actually works", () => {
     // And both reject the same forgery
     const tampered = new Uint8Array(signature)
     tampered[0] ^= 0x01
+
     expect(await node?.(message, tampered, raw)).toBe(false)
     expect(await web?.(message, tampered, raw)).toBe(false)
   })
 
   test("a full token verifies through WebCrypto, the path edge runtimes take", async () => {
     const web = webCryptoVerifier()
+
     if (!web) throw new Error("WebCrypto Ed25519 unavailable in this runtime")
 
     useVerifier(web)
@@ -196,6 +198,7 @@ describe("fuzzing", () => {
       bytes.writeUInt32LE(0x70000000, 2)
 
       const result = await publisher.verify(encode(new Uint8Array(bytes)))
+
       expect(result.subscriber).toBe(false)
     }
   })
@@ -221,6 +224,7 @@ describe("fuzzing", () => {
 
     for (const input of inputs) {
       const result = await publisher.verify(input)
+
       expect(result.subscriber).toBe(false)
     }
   })
@@ -257,7 +261,9 @@ describe("oversized headers stay cheap", () => {
       for (let warmup = 0; warmup < 20; warmup++) await publisher.verify(input)
 
       const started = performance.now()
+
       for (let attempt = 0; attempt < 500; attempt++) await publisher.verify(input)
+
       return performance.now() - started
     }
 
@@ -388,6 +394,7 @@ describe("expiry boundaries", () => {
     await new Promise((resolve) => setTimeout(resolve, 1100))
 
     const afterExpiry = await publisher.verify(token)
+
     expect(afterExpiry).toMatchObject({ subscriber: false, reason: REJECTED.EXPIRED })
   })
 
@@ -416,6 +423,7 @@ describe("one credential, many sites", () => {
       hostnames: "a.example",
       publicKey: authority.publicKey,
     })
+
     const siteB = createPublisher({
       publisherId: "zapub_7Fq2xR9nKdW3mB6tYp1sVzAe",
       hostnames: "b.example",

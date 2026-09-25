@@ -32,6 +32,7 @@ function selectDecoder(): Decoder {
       // `Buffer.from` never throws on bad input, it silently stops at the first invalid character,
       // so the caller's exact-length check is what actually rejects a malformed token
       const buffer = Buffer.from(input, "base64url")
+
       return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength)
     }
   }
@@ -41,7 +42,9 @@ function selectDecoder(): Decoder {
       try {
         const binary = atob(input.replace(/-/g, "+").replace(/_/g, "/"))
         const bytes = new Uint8Array(binary.length)
+
         for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index)
+
         return bytes
       } catch {
         return undefined

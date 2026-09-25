@@ -49,6 +49,7 @@ describe("createPublisher", () => {
     const multi = build({
       hostnames: ["  Example.COM:8080 ", "https://www.example.com/blog"],
     })
+
     expect(multi.hostnames).toEqual(["example.com", "www.example.com"])
   })
 
@@ -77,6 +78,7 @@ describe("verify - accepting a genuine token", () => {
     const result = await publisher.verify(mintToken(authority, HOSTNAME))
 
     expect(result.subscriber).toBe(true)
+
     if (!result.subscriber) throw new Error("unreachable")
 
     expect(result.plan).toBe(PLAN.FREEDOM)
@@ -92,6 +94,7 @@ describe("verify - accepting a genuine token", () => {
 
     for (const host of ["example.com", "EXAMPLE.com", "example.com:443", "example.com."]) {
       const result = await publisher.verify(token, host)
+
       expect(result.subscriber).toBe(true)
     }
   })
@@ -146,6 +149,7 @@ describe("verify - visitors without a usable token", () => {
     ["empty array", [] as string[]],
   ])("reports %s as missing", async (_label, token) => {
     const result = await publisher.verify(token)
+
     expect(result).toMatchObject({
       subscriber: false,
       reason: REJECTED.MISSING,
@@ -159,6 +163,7 @@ describe("verify - visitors without a usable token", () => {
     ["right length, not base64url", "!".repeat(TOKEN_CHARACTERS)],
   ])("reports %s as malformed", async (_label, token) => {
     const result = await publisher.verify(token)
+
     expect(result).toMatchObject({
       subscriber: false,
       reason: REJECTED.MALFORMED,
@@ -167,6 +172,7 @@ describe("verify - visitors without a usable token", () => {
 
   test("reports an unknown plan byte as malformed", async () => {
     const token = mintToken(authority, HOSTNAME, { plan: 99 as never })
+
     expect(await publisher.verify(token)).toMatchObject({
       subscriber: false,
       reason: REJECTED.MALFORMED,
@@ -175,6 +181,7 @@ describe("verify - visitors without a usable token", () => {
 
   test("reports a future protocol version distinctly, so the fix is obvious", async () => {
     const token = mintToken(authority, HOSTNAME, { version: 2 })
+
     expect(await publisher.verify(token)).toMatchObject({
       subscriber: false,
       reason: REJECTED.UNSUPPORTED_VERSION,
@@ -185,6 +192,7 @@ describe("verify - visitors without a usable token", () => {
     const token = mintToken(authority, HOSTNAME, {
       expiresAt: Math.floor(Date.now() / 1000) - 3600,
     })
+
     expect(await publisher.verify(token)).toMatchObject({
       subscriber: false,
       reason: REJECTED.EXPIRED,
@@ -217,6 +225,7 @@ describe("verify - visitors without a usable token", () => {
 
   test("demands a hostname when several are configured", async () => {
     const multi = build({ hostnames: ["a.example", "b.example"] })
+
     expect(multi.verify(mintToken(authority, "a.example"))).rejects.toThrow(/several hostnames/)
   })
 })
@@ -244,6 +253,7 @@ describe("verify - attacks the two-tier binding is meant to stop", () => {
     const forged = bindToHostname(credential, "site-b.example", {
       signingKey: attackersKey,
     })
+
     const siteB = build({ hostnames: "site-b.example" })
 
     expect(await siteB.verify(forged)).toMatchObject({
@@ -264,6 +274,7 @@ describe("verify - attacks the two-tier binding is meant to stop", () => {
 
   test("editing the plan invalidates the authority signature", async () => {
     const token = corruptAt(mintToken(authority, HOSTNAME), 1)
+
     expect(await publisher.verify(token)).toMatchObject({
       subscriber: false,
       reason: REJECTED.MALFORMED,
@@ -293,9 +304,11 @@ describe("verify - attacks the two-tier binding is meant to stop", () => {
     const result = await publisher.verify(corruptAt(mintToken(authority, HOSTNAME), offset))
 
     expect(result.subscriber).toBe(false)
+
     if (result.subscriber) throw new Error("unreachable")
 
     const cryptographicFailures: Rejected[] = [REJECTED.FORGED, REJECTED.WRONG_HOSTNAME]
+
     expect(cryptographicFailures).toContain(result.reason)
   })
 

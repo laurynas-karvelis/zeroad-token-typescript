@@ -19,18 +19,22 @@ export function canonicalHostname(hostname: string): string {
   // `https://example.com/path` -> `example.com`, so a publisher can pass a URL or an origin without
   // having to remember which one this function wanted
   const schemeEnd = value.indexOf("://")
+
   if (schemeEnd !== -1) value = value.slice(schemeEnd + 3)
 
   const pathStart = value.indexOf("/")
+
   if (pathStart !== -1) value = value.slice(0, pathStart)
 
   if (value.startsWith("[")) {
     // IPv6 literal: `[::1]:8080` -> `::1`
     const close = value.indexOf("]")
+
     if (close !== -1) return value.slice(1, close)
   }
 
   const portStart = value.lastIndexOf(":")
+
   if (portStart !== -1 && value.indexOf(":") === portStart) value = value.slice(0, portStart)
 
   // A fully qualified `example.com.` addresses the same host as `example.com`
@@ -51,5 +55,6 @@ export function canonicalHostname(hostname: string): string {
  */
 export function wwwVariants(hostname: string): string[] {
   if (hostname.startsWith("www.")) return [hostname, hostname.slice(4)]
+
   return [hostname, `www.${hostname}`]
 }

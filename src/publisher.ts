@@ -66,6 +66,7 @@ export type Publisher = {
 function resolveCacheOptions(cache: PublisherOptions["cache"]): Partial<CacheOptions> {
   if (cache === false) return { enabled: false }
   if (cache === true || cache === undefined) return {}
+
   return cache
 }
 
@@ -150,6 +151,7 @@ export function createPublisher(options: PublisherOptions): Publisher {
       const key = `${target} ${value}`
 
       const cached = cache.get(key, now)
+
       if (cached) return toResult(cached, target, true)
 
       const verdict = await verifyToken(

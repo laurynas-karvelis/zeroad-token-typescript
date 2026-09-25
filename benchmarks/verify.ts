@@ -25,10 +25,12 @@ async function measure(
   for (let i = 0; i < warmup; i++) await work()
 
   const start = Bun.nanoseconds()
-  for (let i = 0; i < iterations; i++) await work()
-  const elapsedNs = Bun.nanoseconds() - start
 
+  for (let i = 0; i < iterations; i++) await work()
+
+  const elapsedNs = Bun.nanoseconds() - start
   const perCallUs = elapsedNs / iterations / 1000
+
   return { perCallUs, opsPerSec: 1_000_000 / perCallUs }
 }
 

@@ -25,6 +25,7 @@ describe("canonicalHostname", () => {
   test("is idempotent", () => {
     for (const input of ["https://Example.com:8080/x", "example.com.", "[::1]:1"]) {
       const once = canonicalHostname(input)
+
       expect(canonicalHostname(once)).toBe(once)
     }
   })

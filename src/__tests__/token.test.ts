@@ -76,6 +76,7 @@ describe("signed messages", () => {
   test("the authority signature covers version, plan, expiry and the ephemeral key", async () => {
     const authority = createAuthority()
     const parsed = readToken(mintToken(authority, "example.com"))
+
     if (typeof parsed === "string") throw new Error(parsed)
 
     const message = credentialMessage(parsed.bytes)
@@ -87,6 +88,7 @@ describe("signed messages", () => {
 
   test("the hostname message changes with the hostname", () => {
     const parsed = readToken(mintToken(createAuthority(), "example.com"))
+
     if (typeof parsed === "string") throw new Error(parsed)
 
     const forA = hostnameMessage(parsed.bytes, "a.example")
@@ -98,6 +100,7 @@ describe("signed messages", () => {
 
   test("the two domain tags keep the signatures from being interchangeable", () => {
     const parsed = readToken(mintToken(createAuthority(), "example.com"))
+
     if (typeof parsed === "string") throw new Error(parsed)
 
     const credential = Buffer.from(credentialMessage(parsed.bytes))

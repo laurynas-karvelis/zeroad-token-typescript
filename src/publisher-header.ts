@@ -46,5 +46,6 @@ export function parsePublisherHeader(headerValue: string | null | undefined): st
   if (!headerValue) return undefined
 
   const publisherId = headerValue.split(";")[0].trim()
+
   return VALID_PUBLISHER_ID.test(publisherId) ? publisherId : undefined
 }

@@ -73,6 +73,7 @@ function validate(options: Partial<CacheOptions>): void {
 /** Least valuable first: fewest hits, oldest breaking the tie. */
 function isLessValuable(candidate: Entry, incumbent: Entry): boolean {
   if (candidate.hits !== incumbent.hits) return candidate.hits < incumbent.hits
+
   return candidate.storedAt < incumbent.storedAt
 }
 
@@ -115,19 +116,23 @@ export function createResultCache(overrides: Partial<CacheOptions> = {}): Result
       if (!options.enabled) return undefined
 
       const entry = entries.get(key)
+
       if (!entry) {
         misses++
+
         return undefined
       }
 
       if (entry.goodUntil <= now) {
         entries.delete(key)
         misses++
+
         return undefined
       }
 
       entry.hits++
       hits++
+
       return entry.verdict
     },
 

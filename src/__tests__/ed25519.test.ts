@@ -86,6 +86,7 @@ describe("fromBase64Url", () => {
     // Whatever the runtime's decoder does with invalid characters, the result must not be a full
     // token's worth of bytes, because that length check is what gates the expensive path
     const decoded = fromBase64Url("*".repeat(TOKEN_CHARACTERS))
+
     expect(decoded === undefined || decoded.length !== TOKEN_BYTES).toBe(true)
   })
 })

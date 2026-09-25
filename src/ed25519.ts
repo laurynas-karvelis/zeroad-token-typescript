@@ -24,12 +24,14 @@ function toSpki(rawPublicKey: Uint8Array): Uint8Array {
   const spki = new Uint8Array(SPKI_PREFIX.length + rawPublicKey.length)
   spki.set(SPKI_PREFIX, 0)
   spki.set(rawPublicKey, SPKI_PREFIX.length)
+
   return spki
 }
 
 function decodeStandardBase64(base64: string): Uint8Array {
   if (typeof Buffer !== "undefined") {
     const buffer = Buffer.from(base64, "base64")
+
     return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength)
   }
 
@@ -37,7 +39,9 @@ function decodeStandardBase64(base64: string): Uint8Array {
 
   const binary = atob(base64)
   const bytes = new Uint8Array(binary.length)
+
   for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index)
+
   return bytes
 }
 
@@ -93,6 +97,7 @@ export function verifierFromNodeCrypto(nodeCrypto: Partial<typeof import("node:c
       format: "der",
       type: "spki",
     })
+
     return verify(null, message, key, signature)
   }
 }
@@ -105,6 +110,7 @@ export function webCryptoVerifier(): Verifier | undefined {
     const key = await crypto.subtle.importKey("raw", rawPublicKey as BufferSource, { name: "Ed25519" }, false, [
       "verify",
     ])
+
     return crypto.subtle.verify({ name: "Ed25519" }, key, signature as BufferSource, message as BufferSource)
   }
 }

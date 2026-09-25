@@ -24,6 +24,7 @@ function concat(...parts: Uint8Array[]): Uint8Array {
   const result = new Uint8Array(total)
 
   let offset = 0
+
   for (const part of parts) {
     result.set(part, offset)
     offset += part.length
@@ -38,6 +39,7 @@ function toBase64Url(bytes: Uint8Array): string {
 
 function rawPublicKey(key: KeyObject): Uint8Array {
   const der = key.export({ format: "der", type: "spki" })
+
   return new Uint8Array(der.subarray(der.length - 32))
 }
 
@@ -49,6 +51,7 @@ export type Authority = {
 
 export function createAuthority(): Authority {
   const { publicKey, privateKey } = generateKeyPairSync("ed25519")
+
   return {
     publicKey: publicKey.export({ format: "der", type: "spki" }).toString("base64"),
     privateKey,
@@ -109,6 +112,7 @@ export type BindOptions = {
  */
 export function bindToHostname(credential: Credential, hostname: string, options: BindOptions = {}): string {
   const nonce = options.nonce ?? new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])
+
   if (nonce.length !== 8) throw new Error("Nonce must be 8 bytes")
 
   const token = new Uint8Array(TOKEN_BYTES)
@@ -136,5 +140,6 @@ export function mintToken(authority: Authority, hostname: string, options: Issue
 export function corruptAt(token: string, offset: number): string {
   const bytes = new Uint8Array(Buffer.from(token, "base64url"))
   bytes[offset] ^= 0x01
+
   return toBase64Url(bytes)
 }

@@ -59,6 +59,7 @@ describe("caching a good verdict", () => {
     expect((await publisher.verify(token, "a.example")).subscriber).toBe(true)
 
     const atB = await publisher.verify(token, "b.example")
+
     expect(atB).toMatchObject({
       subscriber: false,
       reason: REJECTED.WRONG_HOSTNAME,
@@ -126,6 +127,7 @@ describe("caching a bad verdict", () => {
     })
 
     await publisher.verify(token)
+
     expect(publisher.cacheStats().size).toBe(0)
   })
 })
@@ -145,6 +147,7 @@ describe("cache configuration", () => {
     const token = mintToken(authority, HOSTNAME)
 
     await publisher.verify(token)
+
     expect((await publisher.verify(token)).cached).toBe(true)
     expect(publisher.cacheStats().maxSize).toBe(DEFAULT_CACHE_OPTIONS.maxSize)
   })
@@ -154,6 +157,7 @@ describe("cache configuration", () => {
     const token = mintToken(authority, HOSTNAME)
 
     await publisher.verify(token)
+
     expect((await publisher.verify(token)).cached).toBe(false)
   })
 
@@ -183,6 +187,7 @@ describe("result cache internals", () => {
     const expiresAt = 1_000_000
 
     cache.set("k", { subscriber: true, plan: 1, expiresAt }, 999_000_000)
+
     expect(cache.get("k", 999_500_000)).toBeDefined()
     expect(cache.get("k", expiresAt * 1000 + 1)).toBeUndefined()
   })
@@ -191,6 +196,7 @@ describe("result cache internals", () => {
     const cache = createResultCache({ ttl: 1000 })
 
     cache.set("k", bad, 0)
+
     expect(cache.get("k", 999)).toEqual(bad)
     expect(cache.get("k", 1000)).toBeUndefined()
   })
@@ -199,6 +205,7 @@ describe("result cache internals", () => {
     const cache = createResultCache({ ttl: 60_000 })
 
     cache.set("k", { subscriber: true, plan: 1, expiresAt: 500 }, 1_000_000)
+
     expect(cache.stats().size).toBe(0)
   })
 
@@ -246,6 +253,7 @@ describe("result cache internals", () => {
     const cache = createResultCache({ maxSize: 10_000, ttl: 100 })
 
     for (let index = 0; index < 200; index++) cache.set(`key-${index}`, bad, 0)
+
     expect(cache.stats().size).toBe(200)
 
     // One write past the expiry horizon triggers the sweep that clears the rest
@@ -274,6 +282,7 @@ describe("result cache internals", () => {
     const cache = createResultCache({ enabled: false })
 
     cache.set("a", good, 0)
+
     expect(cache.get("a", 1)).toBeUndefined()
     expect(cache.stats().size).toBe(0)
   })
