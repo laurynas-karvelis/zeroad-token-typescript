@@ -52,21 +52,21 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
+      "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
-      "default": "./dist/index.js"
+      "default": "./dist/index.mjs"
     },
     "./package.json": "./package.json"
   },
   "files": [
-    "dist/*.js",
+    "dist/*.mjs",
     "dist/*.cjs",
     "dist/*.d.ts",
     "SKILLS.md"
   ],
   "scripts": {
     "prettier": "prettier . --write",
-    "build:esm": "bun build ./src/index.ts --outfile ./dist/index.js --target=node --format=esm",
+    "build:esm": "bun build ./src/index.ts --outfile ./dist/index.mjs --target=node --format=esm",
     "build:cjs": "bun build ./src/index.ts --outfile ./dist/index.cjs --target=node --format=cjs",
     "build:types": "tsc --emitDeclarationOnly",
     "build": "rm -rf ./dist && bun run build:esm && bun run build:cjs && bun run build:types",
