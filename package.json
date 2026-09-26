@@ -1,6 +1,6 @@
 {
   "name": "@zeroad.network/token",
-  "version": "0.9.9",
+  "version": "1.0.0",
   "license": "Apache-2.0",
   "repository": "github:laurynas-karvelis/zeroad-token-typescript",
   "homepage": "https://zeroad.network",
@@ -47,7 +47,7 @@
   },
   "type": "module",
   "main": "dist/index.cjs",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
@@ -77,10 +77,10 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/bun": "^1.4.2",
-    "@types/node": "^26.6.2",
-    "biome": "^0.3.3",
-    "typescript": "^7.0.2"
+    "@types/bun": "1.4.2",
+    "@types/node": "26.6.3",
+    "biome": "0.3.3",
+    "typescript": "7.0.2"
   },
   "description": "Offline verification of Zero Ad Network subscriber tokens for publisher backends. Zero dependencies."
 }
