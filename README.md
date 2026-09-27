@@ -91,7 +91,7 @@ Higher tiers can stay restricted.
 
 ### 5. Keep subscriber pages out of shared caches
 
-If a CDN, proxy or page cache sits in front of your app, set it to skip requests carrying `Better-Web-Token`.
+If a CDN, proxy or page cache sits in front of your app, set it to bypass the cache for requests carrying `Better-Web-Token`, so they always reach your app.
 [Set up page caching and CDNs →](https://zeroad.network/docs/site-integration/remove-ads/caching)
 
 ### 6. Check it works
