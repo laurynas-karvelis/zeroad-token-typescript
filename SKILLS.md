@@ -150,9 +150,9 @@ arrives with a protocol version newer than this build understands (still rejecte
 
 - Create the publisher once per process, at module scope.
 - Set `Better-Web-Publisher` on every response, including ones where no token arrived. It is how the
-  extension discovers the site takes part.
+  extension discovers the website takes part.
 - Pass the request's host to `verify()` when serving more than one hostname.
-- Listing an apex admits its `www` sibling and vice versa, so a site serving both needs only one in
+- Listing an apex admits its `www` sibling and vice versa, so a website serving both needs only one in
   the list. The signature is still checked against the exact host each request arrives on.
 - Keep token-bearing requests out of shared page caches: bypass lookup and storage when
   `Better-Web-Token` is present, and send `Cache-Control: private, no-store` on those responses. See
@@ -210,7 +210,7 @@ Tuning: raise `maxSize` if `cacheStats()` shows `size === maxSize` with a climbi
 
 The authority signs the batch credential (bytes 0 to 37) at issuance, over an authenticated session,
 after checking the subscription is live. The extension holds the matching ephemeral private key and
-signs the hostname locally, offline, the first time it meets a site.
+signs the hostname locally, offline, the first time it meets a website.
 
 The hostname is not on the wire. The verifier rebuilds the signed message from the host it serves, so a
 token bound elsewhere fails the signature rather than failing a string comparison.
