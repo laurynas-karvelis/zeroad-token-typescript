@@ -80,11 +80,15 @@ app.use("*", async (c, next) => {
 
 ```ts
 export async function middleware(request: NextRequest) {
-  const visitor = await publisher.verify(request.headers.get("better-web-token"), request.nextUrl.hostname)
+  const visitor = await publisher.verify(request.headers.get(publisher.tokenHeaderName), request.nextUrl.hostname)
 
-  const response = NextResponse.next()
+  // Pass the verdict to pages as a request header. `set` overwrites any value the client sent, so pages can
+  // trust it. Pages that read it render dynamically; never cache them statically.
+  const headers = new Headers(request.headers)
+  headers.set("x-zeroad-subscriber", String(visitor.subscriber))
+
+  const response = NextResponse.next({ request: { headers } })
   response.headers.set(...publisher.header)
-  response.headers.set("x-zeroad-subscriber", String(visitor.subscriber))
   return response
 }
 ```
@@ -150,7 +154,11 @@ arrives with a protocol version newer than this build understands (still rejecte
 - Pass the request's host to `verify()` when serving more than one hostname.
 - Listing an apex admits its `www` sibling and vice versa, so a site serving both needs only one in
   the list. The signature is still checked against the exact host each request arrives on.
-- Log `wrong_hostname` and `forged` counts. Both mean somebody is attacking, not misconfiguring.
+- Keep token-bearing requests out of shared page caches: bypass lookup and storage when
+  `Better-Web-Token` is present, and send `Cache-Control: private, no-store` on those responses. See
+  https://zeroad.network/docs/site-integration/remove-ads/caching.
+- Log `wrong_hostname` and `forged` counts. A spike can mean tampering or replay, but check proxy
+  `Host` rewrites and `publicKey` overrides first. A reason names the failed check, not an attacker.
 
 **Do not**
 
@@ -163,6 +171,8 @@ arrives with a protocol version newer than this build understands (still rejecte
   one case: several hostnames configured and none passed to the call.
 - Do not gate anything on `expiresAt` yourself. It is already checked, with clock tolerance.
 - Do not look for a signing, issuing or key-generation export. There is none.
+- Do not grant access because a `Better-Web-Token` header is present, or because of a client-supplied
+  cookie or header. Only a `subscriber: true` result from `verify()` grants access.
 
 ---
 
@@ -215,9 +225,10 @@ language ports should be checked against it.
 | Symptom                          | Cause                                                                                  |
 | :------------------------------- | :------------------------------------------------------------------------------------- |
 | All `missing`                    | Normal - only subscribers send a token. Verify `Better-Web-Publisher` is on responses. |
+| Test subscriber gets `missing`   | First visit has no token; reload. Else a CDN/proxy strips the header or serves cache.  |
 | All `forged`                     | A `publicKey` override left over from staging.                                         |
 | All `unknown_hostname`           | Host not in `hostnames`. Log `visitor.hostname` to see what arrived; check the proxy.  |
-| `wrong_hostname` from real users | Rare - `www`/apex are folded. Suspect token replay, or a proxy rewriting `Host`.        |
+| `wrong_hostname` from real users | Wrong exact host passed (apex vs `www`), a proxy rewriting `Host`, or token replay.     |
 | `unsupported_version`            | Newer token format. Upgrade the package.                                               |
 | `expired` in bursts              | Server clock drift. Raise `clockToleranceSeconds`, then fix NTP.                       |
 | Throws "several hostnames"       | Multiple hosts configured, none passed to `verify()`.                                  |
@@ -227,8 +238,8 @@ language ports should be checked against it.
 
 ## Performance
 
-Bun 1.3, Apple Silicon, single core, measured end to end through `verify()`: cold 80us (~12,400/s),
-cached 0.33us (~3,000,000/s), malformed ~1us. Uses synchronous `node:crypto` where available (36.7us per signature, against
+Bun 1.4, Apple Silicon, single core, measured end to end through `verify()`: cold 78us (~12,900/s),
+cached 0.16us (~6,200,000/s), malformed 0.7us. Uses synchronous `node:crypto` where available (36.7us per signature, against
 46.0us via the threadpool and 47.3us via WebCrypto), falling back to WebCrypto on edge runtimes.
 
 Runtimes: Node 16+, Bun 1.1+, Deno 2.0+, and edge. ESM and CJS. Zero dependencies.
