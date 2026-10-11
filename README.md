@@ -9,9 +9,9 @@ npm install @zeroad.network/token
 
 **In short**
 
-- Subscribers pay one monthly membership, called Freedom, and use our browser extension.
+- Subscribers pay for one monthly membership, called Freedom, and use our browser extension.
 - On your website, the extension sends a signed `Better-Web-Token` header. This package checks it and answers yes or no.
-- For a yes, serve the page without ads, cookie banners, non-essential trackers or marketing popups. If you sell access, unlock your included paid content.
+- If verification succeeds, serve the page without ads, cookie banners, non-essential trackers or marketing popups. If you sell access, unlock your included paid content.
 - You earn from the time subscribers spend on your website, and keep 70% of your share. Transfers to Stripe
   start once your balance reaches $30 and payout setup is complete. [How earnings work â†’](https://zeroad.network/docs/monetization)
 
@@ -60,7 +60,7 @@ Create it at startup, and reuse it for the life of the process.
 `hostnames` lists every host you serve. It's required, because a token only verifies on a listed host.
 See [why hostnames are an allowlist](#why-hostnames-are-an-allowlist).
 
-### 3. Add one middleware
+### 3. Add a middleware function
 
 ```ts
 app.use(async (request, response, next) => {
@@ -102,7 +102,7 @@ If a CDN, proxy or page cache sits in front of your app, set it to bypass the ca
 3. Reload your website. You should see the clean page.
 4. Open the same URL without the extension, with caches warm. You should see the normal page.
 
-Hono and Express middleware to copy, and the rest of the guide, are at
+For Hono and Express middleware examples and the full setup guide, see
 [zeroad.network/docs](https://zeroad.network/docs/site-integration/remove-ads/node).
 
 ---
@@ -116,7 +116,7 @@ Hono and Express middleware to copy, and the rest of the guide, are at
 | `publisherId`           | `string`             | -            | From your dashboard. `zapub_` followed by 24 alphanumerics.  |
 | `hostnames`             | `string \| string[]` | -            | Every host you serve. An apex covers its `www`. Ports, schemes and paths are stripped. |
 | `publicKey`             | `string`             | platform key | Override for staging and tests. Leave alone in production.   |
-| `clockToleranceSeconds` | `number`             | `60`         | Slack on expiry, for servers whose clocks drift.             |
+| `clockToleranceSeconds` | `number`             | `60`         | Allowed clock difference when checking expiry.             |
 | `cache`                 | `boolean \| object`  | on           | See [caching](#caching).                                     |
 
 It returns an object to keep for the life of the process:
@@ -134,7 +134,7 @@ It returns an object to keep for the life of the process:
 ### `publisher.verify(token, hostname?)`
 
 Pass the raw header value: a `string`, a `string[]` (Node returns an array for a repeated header), `null` or
-`undefined`. It never throws on bad input. A junk token is a result, not an exception.
+`undefined`. It never throws on bad input. An invalid token returns a rejection result instead of throwing an exception.
 
 - **Pass the actual request hostname,** including when you serve both an apex and `www`.
 - **If you omit it,** the single configured hostname is used. With several configured hostnames, omitting it throws.
@@ -264,7 +264,7 @@ key. Standard credentials expire at midnight UTC two days after issue, about 24â
 extension checks its pool hourly, and refreshes when credentials run low or near expiry. Demo and
 publisher-test access use separately issued tokens, restricted to one hostname.
 
-**2. The extension binds one to your hostname.** The first time it meets `example.com`, it takes an unused
+**2. The extension binds one to your hostname.** On the first visit to `example.com`, it takes an unused
 key pair and signs your hostname with the private half. This happens offline. It reuses that bound token
 for your exact hostname while it stays valid.
 
