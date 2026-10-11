@@ -1,6 +1,6 @@
 # @zeroad.network/token
 
-Recognise [Zero Ad Network](https://zeroad.network) subscribers on your server, and serve them a clean page.
+Recognise [Zero Ad Network](https://zeroad.network) subscribers on your server so you can let them browse without ads and access the paid content you include with their membership.
 Verification runs offline, in about 80µs cold and 0.16µs cached, with no dependencies and no calls back to us.
 
 ```bash
